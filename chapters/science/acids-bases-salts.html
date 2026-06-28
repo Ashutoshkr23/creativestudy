@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Acids, Bases & Salts — learn.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/global.css">
+<style>
+  html, body { height: 100%; overflow: hidden; }
+
+  /* ===== HEADER ===== */
+  .chapter-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(7,7,15,0.9); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .chapter-header .row {
+    display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+  }
+  .chapter-header .back {
+    width: 34px; height: 34px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 999px; background: var(--surface); border: 1px solid var(--border);
+  }
+  .chapter-header h1 { font-size: 1rem; flex: 1; }
+  .chapter-header .counter { font-size: 0.8rem; color: var(--text-secondary); font-family: var(--font-head); }
+  .progress-track { height: 3px; background: rgba(255,255,255,0.06); }
+  .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width .3s ease; }
+
+  /* ===== MAIN TOPIC VIEW ===== */
+  .topic-view { display: none; position: fixed; top: var(--header-h, 60px); left: 0; right: 0; bottom: 0; }
+  .topic-view.active { display: block; }
+
+  .scene-container {
+    height: 100%; overflow-y: auto;
+    outline: none;
+  }
+  .scene {
+    height: 100%; position: sticky; top: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px 20px 60px; text-align: center;
+    background: var(--bg);
+  }
+  .scene .eyebrow { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent, var(--primary)); margin-bottom: 10px; font-weight: 600; }
+  .scene h2 { font-size: clamp(1.4rem, 5vw, 2.1rem); margin-bottom: 12px; max-width: 600px; }
+  .scene .explain { color: var(--text-secondary); max-width: 480px; font-size: 0.95rem; margin-bottom: 24px; }
+  .scene .visual { width: 100%; max-width: 480px; min-height: 180px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+  .scene .fun-fact {
+    max-width: 460px; padding: 12px 18px; border-radius: var(--radius-sm);
+    background: var(--surface); border: 1px solid var(--border); font-size: 0.82rem; color: var(--text-secondary);
+  }
+  .scene .fun-fact b { color: var(--text); }
+
+  /* scene dots */
+  .scene-dots {
+    position: fixed; right: 14px; top: 50%; transform: translateY(-50%); z-index: 60;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .scene-dots .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.15); transition: all .2s ease; }
+  .scene-dots .dot.active { background: var(--accent, var(--primary)); height: 20px; border-radius: 4px; }
+
+  /* ===== ACID VISUALS ===== */
+  .beaker { width: 90px; height: 110px; border: 3px solid rgba(255,255,255,0.3); border-radius: 0 0 14px 14px; position: relative; overflow: hidden; }
+  .beaker .liquid { position: absolute; bottom: 0; left: 0; right: 0; height: 65%; transition: background 1s ease; }
+  .h-ion { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--primary); color:#fff; font-size:9px; display:flex; align-items:center; justify-content:center; font-weight:700; animation: floatUp 2.4s ease-in infinite; }
+  @keyframes floatUp { 0% { transform: translateY(0) scale(0.6); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-90px) scale(1); opacity: 0; } }
+
+  .fizz-dot { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.6); animation: fizz 1.6s ease-in infinite; }
+  @keyframes fizz { 0% { transform: translateY(0); opacity: 0.8; } 100% { transform: translateY(-70px); opacity: 0; } }
+
+  .flip-cards { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; perspective: 800px; }
+  .flip-card { width: 90px; height: 100px; position: relative; cursor: pointer; }
+  .flip-inner { width: 100%; height: 100%; position: relative; transition: transform .6s; transform-style: preserve-3d; }
+  .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-front, .flip-back {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 10px; border: 1px solid var(--border); background: var(--surface); font-size: 1.8rem;
+  }
+  .flip-back { transform: rotateY(180deg); font-size: 0.72rem; padding: 6px; text-align: center; color: var(--text-secondary); }
+
+  /* sour-sorting warm-up game */
+  .sort-game { display: flex; flex-direction: column; align-items: center; gap: 18px; width: 100%; max-width: 380px; }
+  .sort-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; }
+  .sort-item {
+    aspect-ratio: 1; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.5rem; gap: 4px;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .sort-item span { font-size: 0.58rem; color: var(--text-secondary); }
+  .sort-item.placed { opacity: 0; transform: scale(0.5); pointer-events: none; }
+  .sort-item.wrong-shake { animation: itemShake .3s ease; }
+  @keyframes itemShake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  .sort-basket {
+    display: flex; flex-direction: column; align-items: center; padding: 14px 30px;
+    border: 2px dashed rgba(255,255,255,0.2); border-radius: 14px; transition: border-color .3s ease;
+  }
+  .sort-basket.full { border-color: var(--accent); }
+  .basket-icon { font-size: 2.1rem; }
+  .basket-label { font-size: 0.78rem; color: var(--text-secondary); margin-top: 4px; }
+  .basket-count { font-family: var(--font-head); margin-top: 4px; }
+  .sort-reveal { display: none; margin-top: 6px; }
+  .sort-reveal.show { display: flex; justify-content: center; }
+
+  /* property cards row */
+  .property-row {
+    display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory;
+    width: 100%; max-width: 480px; padding: 4px 2px 10px;
+  }
+  .property-row::-webkit-scrollbar { display: none; }
+  .property-card {
+    flex: 0 0 130px; scroll-snap-align: start; padding: 16px 12px; text-align: center;
+  }
+  .property-card .ico { font-size: 1.6rem; margin-bottom: 8px; }
+  .property-card h4 { font-size: 0.82rem; margin-bottom: 4px; line-height: 1.25; }
+  .property-card p { font-size: 0.7rem; color: var(--text-secondary); line-height: 1.3; }
+  .swipe-hint { font-size: 0.7rem; color: var(--text-muted); margin-top: -4px; margin-bottom: 16px; }
+
+  /* strong vs weak acid meter */
+  .strength-meter { width: 100%; max-width: 420px; }
+  .strength-bar {
+    height: 14px; border-radius: 999px; width: 100%;
+    background: linear-gradient(90deg, #EF9F27, #D85A30);
+    position: relative; margin-bottom: 14px;
+  }
+  .strength-marker {
+    position: absolute; top: -6px; width: 2px; height: 26px; background: rgba(255,255,255,0.5);
+  }
+  .acid-chip-row { display: flex; justify-content: space-between; gap: 10px; }
+  .acid-chip-group { display: flex; flex-direction: column; gap: 6px; align-items: center; flex: 1; }
+  .acid-chip-group .group-label { font-size: 0.7rem; color: var(--text-secondary); font-weight: 600; }
+  .acid-chip {
+    font-size: 0.72rem; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  /* pH scale strip */
+  .ph-strip { display: flex; width: 100%; max-width: 460px; border-radius: 10px; overflow: hidden; height: 36px; }
+  .ph-strip div { flex: 1; }
+  .ph-labels { display: flex; width: 100%; max-width: 460px; justify-content: space-between; font-size: 0.65rem; color: var(--text-muted); margin-top: 6px; }
+
+  /* neutralisation fighters */
+  .vs-row { display: flex; align-items: center; gap: 16px; justify-content: center; }
+  .fighter { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: var(--font-head); font-size: 0.85rem; }
+  .fighter.acid { background: radial-gradient(circle, var(--coral), transparent); border: 2px solid var(--coral); }
+  .fighter.base { background: radial-gradient(circle, var(--teal), transparent); border: 2px solid var(--teal); }
+  .vs-label { font-family: var(--font-head); color: var(--text-muted); font-size: 0.8rem; }
+
+  /* ===== END OF TOPIC ===== */
+  .end-screen { gap: 0; }
+  .end-screen h2 { margin-bottom: 28px; }
+  .action-cards { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; max-width: 560px; margin-bottom: 22px; }
+  .action-card {
+    width: 150px; padding: 22px 14px; text-align: center; cursor: pointer;
+  }
+  .action-card .ico { font-size: 1.8rem; margin-bottom: 8px; }
+  .action-card h4 { font-size: 0.9rem; margin-bottom: 4px; }
+  .action-card p { font-size: 0.72rem; color: var(--text-secondary); }
+  .action-card:hover { box-shadow: 0 0 24px var(--glow, rgba(108,99,255,0.35)); }
+  .action-card.disabled { opacity: 0.35; pointer-events: none; }
+  .skip-btn { font-size: 0.85rem; color: var(--text-secondary); text-decoration: underline; }
+
+  /* ===== OVERLAYS (games/quiz) ===== */
+  .overlay {
+    position: fixed; inset: 0; z-index: 200; background: rgba(7,7,15,0.97);
+    display: none; flex-direction: column; align-items: center; justify-content: center;
+    padding: 60px 20px 30px; text-align: center;
+  }
+  .overlay.open { display: flex; }
+  .overlay .close-btn {
+    position: absolute; top: 16px; right: 16px; width: 36px; height: 36px;
+    border-radius: 999px; background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+  }
+  .overlay h2 { margin-bottom: 8px; }
+  .overlay .sub { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 24px; }
+
+  /* pH Dropper game */
+  .ph-game { display: flex; gap: 30px; align-items: center; flex-wrap: wrap; justify-content: center; }
+  .ph-tube { width: 70px; height: 160px; border: 3px solid rgba(255,255,255,0.3); border-radius: 0 0 20px 20px; position: relative; overflow: hidden; background: rgba(255,255,255,0.02); }
+  .ph-tube .liquid { position: absolute; bottom: 0; left: 0; right: 0; height: 40%; background: #999; transition: background 0.6s ease, height .3s ease; }
+  .ph-meter { font-family: var(--font-head); font-size: 2rem; margin-top: 10px; }
+  .substances { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; max-width: 280px; }
+  .substance {
+    width: 64px; height: 64px; border-radius: var(--radius-sm); background: var(--surface);
+    border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 1.4rem; cursor: grab; user-select: none;
+  }
+  .substance span { font-size: 0.55rem; color: var(--text-secondary); margin-top: 2px; }
+  .indicator-chart { display: flex; flex-direction: column; gap: 2px; }
+  .indicator-chart .seg { width: 18px; height: 14px; }
+  .drop-target { width: 110px; height: 110px; border: 2px dashed rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--text-muted); }
+  .drop-target.over { border-color: var(--primary); color: var(--primary); }
+  .ph-feedback { margin-top: 14px; font-size: 0.85rem; min-height: 20px; }
+
+  /* Acid vs Base Fight */
+  .fight-arena { display: flex; align-items: center; gap: 40px; margin-bottom: 20px; }
+  .fight-char { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--font-head); font-weight: 700; transition: transform .3s ease; }
+  .fight-char.acid { background: radial-gradient(circle, var(--coral), rgba(216,90,48,0.1)); border: 3px solid var(--coral); }
+  .fight-char.base { background: radial-gradient(circle, var(--teal), rgba(29,184,138,0.1)); border: 3px solid var(--teal); }
+  .fight-char.zap { transform: scale(0); }
+  .equation { font-family: var(--font-head); font-size: 1.1rem; margin: 16px 0; min-height: 28px; color: var(--primary); }
+  .splash { font-size: 2.5rem; opacity: 0; transition: opacity .3s ease; }
+  .splash.show { opacity: 1; }
+
+  /* Balance scale */
+  .scale-wrap { display: flex; flex-direction: column; align-items: center; }
+  .scale-beam { width: 280px; height: 6px; background: var(--surface-2); border-radius: 4px; position: relative; transition: transform .4s ease; transform-origin: center; margin-top: 60px; }
+  .scale-pan { position: absolute; width: 90px; min-height: 50px; border: 2px solid var(--border); border-radius: 10px; background: var(--surface); top: 18px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; padding: 6px; }
+  .scale-pan.left { left: -10px; }
+  .scale-pan.right { right: -10px; }
+  .scale-pole { width: 4px; height: 50px; background: var(--surface-2); }
+  .scale-mol { width: 22px; height: 22px; border-radius: 50%; font-size: 0.6rem; display: flex; align-items: center; justify-content: center; cursor: grab; }
+  .scale-mol.acid { background: var(--coral); }
+  .scale-mol.base { background: var(--teal); }
+  .scale-tray { display: flex; gap: 8px; margin-top: 30px; flex-wrap: wrap; justify-content: center; }
+  .scale-status { margin-top: 14px; font-size: 0.85rem; color: var(--text-secondary); }
+
+  /* Quiz */
+  .quiz-card { width: 100%; max-width: 420px; }
+  .timer-ring-wrap { width: 56px; height: 56px; margin: 0 auto 18px; }
+  .quiz-q { font-size: 1.1rem; margin-bottom: 20px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-opt {
+    padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--surface); text-align: left; font-size: 0.9rem; transition: all .2s ease;
+  }
+  .quiz-opt.correct { border-color: var(--teal); background: rgba(29,184,138,0.15); box-shadow: 0 0 16px rgba(29,184,138,0.3); }
+  .quiz-opt.wrong { border-color: var(--coral); background: rgba(216,90,48,0.15); animation: shake .3s ease; }
+  @keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+  .quiz-progress { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
+  .quiz-score { font-size: 2.2rem; font-family: var(--font-head); margin-bottom: 8px; }
+
+  @media (max-width: 480px) {
+    .action-cards { gap: 10px; }
+    .action-card { width: 44%; padding: 16px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="chapter-header">
+  <div class="row">
+    <a href="../science.html" class="back">←</a>
+    <h1>Acids, Bases & Salts</h1>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+</header>
+
+<div id="topics-root"></div>
+
+<div class="scene-dots" id="scene-dots"></div>
+
+<!-- ===================== OVERLAYS ===================== -->
+
+<!-- pH Dropper Game -->
+<div class="overlay" id="overlay-ph">
+  <button class="close-btn" data-close="overlay-ph">✕</button>
+  <h2>🧪 pH Dropper</h2>
+  <p class="sub">Drag a substance into the tube and watch the colour change. Guess if it's acidic, basic, or neutral!</p>
+  <div class="ph-game">
+    <div class="substances" id="ph-substances"></div>
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <div class="ph-tube" id="ph-tube"><div class="liquid" id="ph-liquid"></div></div>
+      <div class="ph-meter" id="ph-meter">pH 7</div>
+      <div class="ph-feedback" id="ph-feedback">Drag a substance below ↓</div>
+    </div>
+    <div class="indicator-chart" id="ph-chart"></div>
+  </div>
+</div>
+
+<!-- Acid vs Base Fight -->
+<div class="overlay" id="overlay-fight">
+  <button class="close-btn" data-close="overlay-fight">✕</button>
+  <h2>⚔️ Acid vs Base Fight</h2>
+  <p class="sub">Tap the lightning bolt to trigger the neutralisation reaction!</p>
+  <div class="fight-arena">
+    <div class="fight-char acid" id="fight-acid">HCl</div>
+    <button id="fight-trigger" style="font-size:2rem;">⚡</button>
+    <div class="fight-char base" id="fight-base">NaOH</div>
+  </div>
+  <div class="splash" id="fight-splash">💥</div>
+  <div class="equation" id="fight-equation">HCl + NaOH → ?</div>
+  <button class="btn btn-primary" id="fight-reset" style="display:none;">Fight Again</button>
+</div>
+
+<!-- Reaction Balance Scale -->
+<div class="overlay" id="overlay-scale">
+  <button class="close-btn" data-close="overlay-scale">✕</button>
+  <h2>⚖️ Reaction Balance Scale</h2>
+  <p class="sub">Click molecules below to add them and balance the acid-base reaction.</p>
+  <div class="scale-wrap">
+    <div class="scale-beam" id="scale-beam">
+      <div class="scale-pan left" id="scale-left"></div>
+      <div class="scale-pan right" id="scale-right"></div>
+    </div>
+    <div class="scale-pole"></div>
+  </div>
+  <div class="scale-tray">
+    <button class="scale-mol acid" data-side="left">H⁺</button>
+    <button class="scale-mol base" data-side="right">OH⁻</button>
+  </div>
+  <div class="scale-status" id="scale-status">Add equal H⁺ and OH⁻ to balance!</div>
+  <button class="btn btn-primary" id="scale-reset" style="display:none; margin-top:10px;">Reset</button>
+</div>
+
+<!-- Quiz -->
+<div class="overlay" id="overlay-quiz">
+  <button class="close-btn" data-close="overlay-quiz">✕</button>
+  <div class="quiz-card" id="quiz-card"></div>
+</div>
+
+<script src="../../assets/js/utils.js"></script>
+<script>
+const CHAPTER_ID = 'acids-bases-salts';
+
+/* ============== TOPIC DATA ============== */
+const TOPICS = [
+  {
+    id: 'acid', title: 'What is an Acid?', color: '#D85A30',
+    scenes: [
+      `<div class="eyebrow">Warm-up</div>
+       <h2>Sort the sour stuff</h2>
+       <p class="explain">Tap the items that taste sour and drop them in the basket. Watch out for decoys!</p>
+       <div class="sort-game">
+         <div class="sort-items" id="sort-items">
+           <button class="sort-item" data-sour="1">🍋<span>Lemon</span></button>
+           <button class="sort-item" data-sour="1">🫘<span>Tamarind</span></button>
+           <button class="sort-item" data-sour="1">🥗<span>Vinegar</span></button>
+           <button class="sort-item" data-sour="1">🥣<span>Curd</span></button>
+           <button class="sort-item" data-sour="0">🍬<span>Sugar</span></button>
+           <button class="sort-item" data-sour="0">🥛<span>Milk</span></button>
+           <button class="sort-item" data-sour="0">🍌<span>Banana</span></button>
+           <button class="sort-item" data-sour="0">💧<span>Water</span></button>
+         </div>
+         <div class="sort-basket" id="sort-basket">
+           <div class="basket-icon">🧺</div>
+           <div class="basket-label">Sour Basket</div>
+           <div class="basket-count" id="basket-count">0 / 4</div>
+         </div>
+       </div>
+       <div class="sort-reveal" id="sort-reveal">
+         <div class="flip-card" style="width:210px; height:130px;">
+           <div class="flip-inner">
+             <div class="flip-front" style="flex-direction:column; gap:8px; font-size:0.95rem; padding:10px;">🤔 Why are they all sour?<span style="font-size:0.62rem; color:var(--text-muted);">tap to find out</span></div>
+             <div class="flip-back" style="font-size:0.95rem;">They all contain an <b>ACID</b>! 🧪</div>
+           </div>
+         </div>
+       </div>`,
+      `<div class="eyebrow">Definition</div>
+       <h2>Acids release H⁺ ions in water</h2>
+       <p class="explain">When an acid dissolves in water, it breaks apart and lets go of tiny hydrogen ions (H⁺). These H⁺ ions are what make it "acidic".</p>
+       <div class="visual"><div class="beaker"><div class="liquid" style="background:#D85A30;"></div>
+         <div class="h-ion" style="left:20px; animation-delay:0s;">H⁺</div>
+         <div class="h-ion" style="left:45px; animation-delay:.6s;">H⁺</div>
+         <div class="h-ion" style="left:60px; animation-delay:1.2s;">H⁺</div>
+       </div></div>
+       <div class="fun-fact">💡 <b>Fun fact:</b> The word "acid" comes from the Latin word <i>acere</i> — meaning "sour".</div>`,
+      `<div class="eyebrow">Properties</div>
+       <h2>A few things every acid does</h2>
+       <p class="explain">Swipe through — these are true for every acid you'll ever meet.</p>
+       <div class="visual"><div class="property-row">
+         <div class="card property-card"><div class="ico">😖</div><h4>Sour taste</h4><p>Remember the basket? That sourness is the acid.</p></div>
+         <div class="card property-card"><div class="ico">🧪</div><h4>Turns litmus red</h4><p>Blue litmus paper or solution turns red.</p></div>
+         <div class="card property-card"><div class="ico">⚠️</div><h4>Corrosive</h4><p>Strong acids can burn skin & eat through metal.</p></div>
+         <div class="card property-card"><div class="ico">💧</div><h4>Soluble in water</h4><p>Acids dissolve easily and mix into water.</p></div>
+       </div></div>
+       <div class="swipe-hint">← swipe for more →</div>
+       <div class="fun-fact">🧪 <b>Try it:</b> Drop blue litmus paper in lemon juice at home — it turns red instantly!</div>`,
+      `<div class="eyebrow">Strong vs Weak</div>
+       <h2>Not all acids are equally acidic</h2>
+       <p class="explain">Mineral acids are made in labs/industries and are strong. Organic acids come from living things and are weak.</p>
+       <div class="visual"><div class="strength-meter">
+         <div class="strength-bar"><div class="strength-marker" style="left:15%;"></div><div class="strength-marker" style="left:85%;"></div></div>
+         <div class="acid-chip-row">
+           <div class="acid-chip-group">
+             <span class="group-label">Weak (Organic)</span>
+             <span class="acid-chip">Citric acid</span>
+             <span class="acid-chip">Acetic acid</span>
+             <span class="acid-chip">Lactic acid</span>
+           </div>
+           <div class="acid-chip-group">
+             <span class="group-label">Strong (Mineral)</span>
+             <span class="acid-chip">HCl</span>
+             <span class="acid-chip">H₂SO₄</span>
+             <span class="acid-chip">HNO₃</span>
+           </div>
+         </div>
+       </div></div>
+       <div class="fun-fact">💡 <b>Rule of thumb:</b> if it came from a plant or animal (lemon, vinegar, curd) — it's organic & weak. If it's made in a factory/lab — it's mineral & strong.</div>`,
+      `<div class="eyebrow">Real Life</div>
+       <h2>Acids are all around you</h2>
+       <p class="explain">Tap each card to flip it and see where this acid hides in daily life.</p>
+       <div class="visual"><div class="flip-cards">
+         <div class="flip-card"><div class="flip-inner"><div class="flip-front">🍋</div><div class="flip-back">Lemon juice — citric acid</div></div></div>
+         <div class="flip-card"><div class="flip-inner"><div class="flip-front">🥗</div><div class="flip-back">Vinegar — acetic acid</div></div></div>
+         <div class="flip-card"><div class="flip-inner"><div class="flip-front">🔋</div><div class="flip-back">Car battery — sulphuric acid</div></div></div>
+         <div class="flip-card"><div class="flip-inner"><div class="flip-front">🥛</div><div class="flip-back">Curd — lactic acid</div></div></div>
+       </div></div>
+       <div class="fun-fact">😮 <b>Did you know?</b> Your own stomach makes hydrochloric acid to digest food!</div>`,
+      `<div class="eyebrow">The Sour Connection</div>
+       <h2>That sour taste? That's the acid talking</h2>
+       <p class="explain">Every sour food you've ever tasted — raw mango, tamarind, lemon — has an acid in it. Your tongue is literally detecting H⁺ ions!</p>
+       <div class="visual" style="font-size:3rem;">🍋😖🤤</div>
+       <div class="fun-fact">⚠️ <b>Careful:</b> Strong acids (like battery acid) are dangerous and corrosive — never taste those!</div>`
+    ],
+    quiz: [
+      { q: 'What ion do acids release in water?', opts: ['OH⁻', 'H⁺', 'Na⁺', 'Cl⁻'], correct: 1 },
+      { q: 'Acids turn blue litmus paper...', opts: ['Green', 'Red', 'Yellow', 'No change'], correct: 1 },
+      { q: 'Which of these is NOT acidic?', opts: ['Lemon juice', 'Vinegar', 'Soap', 'Curd'], correct: 2 },
+      { q: 'Which acid is found in your stomach?', opts: ['Citric acid', 'Hydrochloric acid', 'Acetic acid', 'Lactic acid'], correct: 1 },
+      { q: 'Acids reacting with metals release which gas?', opts: ['Oxygen', 'Carbon dioxide', 'Hydrogen', 'Nitrogen'], correct: 2 }
+    ],
+    actions: { play: false, sim: false }
+  },
+  {
+    id: 'base', title: 'What is a Base?', color: '#1DB88A',
+    scenes: [
+      `<div class="eyebrow">Definition</div>
+       <h2>Bases release OH⁻ ions in water</h2>
+       <p class="explain">A base is the opposite of an acid — it releases hydroxide ions (OH⁻) when dissolved in water.</p>
+       <div class="visual"><div class="beaker"><div class="liquid" style="background:#1DB88A;"></div>
+         <div class="h-ion" style="left:20px; background:var(--teal); animation-delay:0s;">OH⁻</div>
+         <div class="h-ion" style="left:50px; background:var(--teal); animation-delay:.7s;">OH⁻</div>
+       </div></div>
+       <div class="fun-fact">💡 <b>Fun fact:</b> Bases that dissolve in water are called <b>alkalis</b>.</div>`,
+      `<div class="eyebrow">Properties</div>
+       <h2>Bases turn red litmus blue</h2>
+       <p class="explain">Bases feel soapy/slippery to touch and turn red litmus paper blue — the exact opposite of acids.</p>
+       <div class="visual"><div class="beaker"><div class="liquid" style="background:#1DB88A;"></div></div></div>
+       <div class="fun-fact">🧼 <b>Try it:</b> Soap feels slippery because it's a base!</div>`,
+      `<div class="eyebrow">Real Life</div>
+       <h2>Bases at home</h2>
+       <p class="explain">Flip the cards to find bases hiding in your kitchen and bathroom.</p>
+       <div class="visual"><div class="flip-cards">
+         <div class="flip-card"><div class="flip-inner"><div class="flip-front">🧼</div><div class="flip-back">Soap — mild base</div></div></div>
+         <div class="flip-card"><div class="flip-inner"><div class="flip-front">🍰</div><div class="flip-back">Baking soda — sodium bicarbonate</div></div></div>
+         <div class="flip-card"><div class="flip-inner"><div class="flip-front">🧴</div><div class="flip-back">Antacid — magnesium hydroxide</div></div></div>
+         <div class="flip-card"><div class="flip-inner"><div class="flip-front">🪣</div><div class="flip-back">Lime water — calcium hydroxide</div></div></div>
+       </div></div>
+       <div class="fun-fact">😮 <b>Did you know?</b> Antacid tablets are bases — they neutralise extra stomach acid when you have acidity!</div>`
+    ],
+    quiz: [
+      { q: 'What ion do bases release in water?', opts: ['H⁺', 'OH⁻', 'Na⁺', 'CO₂'], correct: 1 },
+      { q: 'Bases turn red litmus paper...', opts: ['Blue', 'Red', 'Colourless', 'Yellow'], correct: 0 },
+      { q: 'Which feels soapy/slippery?', opts: ['Acids', 'Bases', 'Water', 'Salts'], correct: 1 },
+      { q: 'Antacid tablets work by...', opts: ['Adding more acid', 'Neutralising excess acid', 'Cooling the stomach', 'Adding sugar'], correct: 1 },
+      { q: 'A base that dissolves in water is called?', opts: ['Salt', 'Alkali', 'Indicator', 'Solvent'], correct: 1 }
+    ],
+    actions: { play: false, sim: false }
+  },
+  {
+    id: 'phscale', title: 'The pH Scale', color: '#EF9F27',
+    scenes: [
+      `<div class="eyebrow">The Scale</div>
+       <h2>pH measures how strong an acid or base is</h2>
+       <p class="explain">The pH scale runs from 0 to 14. Below 7 is acidic, exactly 7 is neutral, above 7 is basic.</p>
+       <div class="visual" style="flex-direction:column;">
+         <div class="ph-strip">
+           <div style="background:#D11F1F"></div><div style="background:#E0432B"></div><div style="background:#EF6F1F"></div>
+           <div style="background:#EF9F27"></div><div style="background:#E8C547"></div><div style="background:#D8D84A"></div>
+           <div style="background:#9ACD32"></div><div style="background:#1DB88A"></div><div style="background:#1DA0B8"></div>
+           <div style="background:#2E7FCE"></div><div style="background:#3D5FE0"></div><div style="background:#5A3DE0"></div>
+           <div style="background:#7A2DCB"></div><div style="background:#9020A8"></div>
+         </div>
+         <div class="ph-labels"><span>0</span><span>Acidic</span><span>7 Neutral</span><span>Basic</span><span>14</span></div>
+       </div>
+       <div class="fun-fact">💡 "pH" stands for "power of Hydrogen" — it measures H⁺ ion concentration.</div>`,
+      `<div class="eyebrow">Where things fall</div>
+       <h2>Everyday pH values</h2>
+       <p class="explain">Lemon juice ≈ 2, milk ≈ 6.5, pure water = 7, soap ≈ 9-10, bleach ≈ 13.</p>
+       <div class="visual" style="font-size:2.2rem; display:flex; gap:14px;">🍋<span style="font-size:1rem;color:var(--text-muted);">2</span> 🥛<span style="font-size:1rem;color:var(--text-muted);">6.5</span> 💧<span style="font-size:1rem;color:var(--text-muted);">7</span> 🧼<span style="font-size:1rem;color:var(--text-muted);">10</span></div>
+       <div class="fun-fact">🩸 Human blood is slightly basic — pH 7.4. Even tiny changes can make you very sick!</div>`
+    ],
+    quiz: [
+      { q: 'pH scale ranges from?', opts: ['0 to 10', '0 to 14', '1 to 7', '-7 to 7'], correct: 1 },
+      { q: 'Pure water has a pH of?', opts: ['0', '7', '14', '5'], correct: 1 },
+      { q: 'A pH below 7 means the substance is?', opts: ['Basic', 'Neutral', 'Acidic', 'Salty'], correct: 2 },
+      { q: 'Normal human blood pH is approximately?', opts: ['7.4', '3.0', '10.0', '1.0'], correct: 0 },
+      { q: '"pH" stands for?', opts: ['Power of Hydrogen', 'Potential Heat', 'Per Hour', 'Physical Hardness'], correct: 0 }
+    ],
+    actions: { play: true, sim: false }
+  },
+  {
+    id: 'neutralisation', title: 'Neutralisation Reactions', color: '#D4537E',
+    scenes: [
+      `<div class="eyebrow">The Reaction</div>
+       <h2>Acid + Base = Salt + Water</h2>
+       <p class="explain">When an acid and a base meet, they cancel each other out — this is called neutralisation. The H⁺ and OH⁻ join to form water.</p>
+       <div class="visual"><div class="vs-row">
+         <div class="fighter acid">HCl</div><div class="vs-label">+</div><div class="fighter base">NaOH</div>
+       </div></div>
+       <div class="fun-fact">⚗️ HCl + NaOH → NaCl + H₂O (table salt + water!)</div>`,
+      `<div class="eyebrow">Why it matters</div>
+       <h2>This happens inside your body too</h2>
+       <p class="explain">When you have acidity, your stomach has too much HCl. An antacid (a base) neutralises the extra acid — that's how it relieves the burning feeling.</p>
+       <div class="visual" style="font-size:2.5rem;">🔥➡️🧴➡️😌</div>
+       <div class="fun-fact">🌾 Farmers also neutralise acidic soil by adding lime (a base) before planting crops.</div>`
+    ],
+    quiz: [
+      { q: 'Neutralisation produces salt and what else?', opts: ['Oxygen', 'Water', 'Hydrogen gas', 'Carbon dioxide'], correct: 1 },
+      { q: 'HCl + NaOH gives NaCl and?', opts: ['CO₂', 'H₂O', 'O₂', 'N₂'], correct: 1 },
+      { q: 'Antacids relieve acidity because they are?', opts: ['Acidic', 'Basic', 'Neutral salts', 'Sugary'], correct: 1 },
+      { q: 'Farmers add lime to soil to neutralise?', opts: ['Excess base', 'Excess acid', 'Excess salt', 'Excess water'], correct: 1 },
+      { q: 'Neutralisation is a reaction between?', opts: ['Two acids', 'Two bases', 'An acid and a base', 'A salt and water'], correct: 2 }
+    ],
+    actions: { play: true, sim: true }
+  },
+  {
+    id: 'salts', title: 'Salts & Their Formation', color: '#6C63FF',
+    scenes: [
+      `<div class="eyebrow">What is a salt?</div>
+       <h2>Salts form when an acid meets a base</h2>
+       <p class="explain">Common salt (NaCl) is just one example — there are thousands of different salts, each formed from a specific acid + base pair.</p>
+       <div class="visual" style="font-size:2.5rem;">🧂</div>
+       <div class="fun-fact">💡 Table salt is sodium chloride — formed from hydrochloric acid and sodium hydroxide.</div>`,
+      `<div class="eyebrow">Types of salts</div>
+       <h2>Not all salts taste like table salt!</h2>
+       <p class="explain">Salts can be acidic, basic, or neutral depending on the strength of the acid and base that formed them.</p>
+       <div class="visual" style="font-size:2rem; display:flex; gap:18px;">🧂 🥖 🧪</div>
+       <div class="fun-fact">🍞 Baking soda (sodium bicarbonate) is a salt that helps bread rise!</div>`
+    ],
+    quiz: [
+      { q: 'Table salt is chemically called?', opts: ['Calcium carbonate', 'Sodium chloride', 'Potassium nitrate', 'Sodium hydroxide'], correct: 1 },
+      { q: 'Salts are formed from an acid and a?', opts: ['Metal', 'Base', 'Gas', 'Indicator'], correct: 1 },
+      { q: 'Baking soda is also known as?', opts: ['Sodium bicarbonate', 'Sodium chloride', 'Calcium oxide', 'Citric acid'], correct: 0 },
+      { q: 'Can salts be acidic or basic?', opts: ['No, always neutral', 'Yes, depending on formation', 'Only acidic', 'Only basic'], correct: 1 },
+      { q: 'NaCl is formed from HCl and?', opts: ['NaOH', 'H₂O', 'CO₂', 'O₂'], correct: 0 }
+    ],
+    actions: { play: false, sim: false }
+  }
+];
+
+/* ============== HEADER HEIGHT SYNC ============== */
+function syncHeaderHeight() {
+  const h = document.querySelector('.chapter-header').offsetHeight;
+  document.documentElement.style.setProperty('--header-h', h + 'px');
+}
+syncHeaderHeight();
+window.addEventListener('resize', syncHeaderHeight);
+
+/* ============== RENDER TOPIC VIEWS ============== */
+const rootEl = document.getElementById('topics-root');
+const dotsEl = document.getElementById('scene-dots');
+
+TOPICS.forEach((t, i) => {
+  const view = document.createElement('div');
+  view.className = 'topic-view' + (i === 0 ? ' active' : '');
+  view.id = 'topic-' + t.id;
+  view.style.setProperty('--accent', t.color);
+
+  const container = document.createElement('div');
+  container.className = 'scene-container';
+  container.tabIndex = 0;
+  container.style.setProperty('--accent', t.color);
+
+  t.scenes.forEach(html => {
+    const scene = document.createElement('div');
+    scene.className = 'scene';
+    scene.style.setProperty('--accent', t.color);
+    scene.innerHTML = html;
+    container.appendChild(scene);
+  });
+
+  // end-of-topic scene
+  const end = document.createElement('div');
+  end.className = 'scene end-screen';
+  end.style.setProperty('--accent', t.color);
+  end.innerHTML = `
+    <h2>Nice work! Ready to lock it in?</h2>
+    <div class="action-cards">
+      <div class="card action-card ${t.actions.play ? '' : 'disabled'}" data-action="play" style="--glow:${t.color}55;">
+        <div class="ico">🎮</div><h4>Play</h4><p>${t.actions.play ? 'Mini game' : 'Coming soon'}</p>
+      </div>
+      <div class="card action-card ${t.actions.sim ? '' : 'disabled'}" data-action="sim" style="--glow:${t.color}55;">
+        <div class="ico">🧪</div><h4>Simulate</h4><p>${t.actions.sim ? 'Interactive sim' : 'Coming soon'}</p>
+      </div>
+      <div class="card action-card" data-action="quiz" style="--glow:${t.color}55;">
+        <div class="ico">⚡</div><h4>Quick Quiz</h4><p>5 rapid questions</p>
+      </div>
+    </div>
+    <button class="skip-btn" data-action="skip">Skip to next topic →</button>
+  `;
+  container.appendChild(end);
+
+  view.appendChild(container);
+  rootEl.appendChild(view);
+
+  // wire end-screen actions
+  end.querySelector('[data-action="play"]').addEventListener('click', () => {
+    if (!t.actions.play) return;
+    if (t.id === 'phscale') openPhGame();
+    if (t.id === 'neutralisation') openFightGame();
+  });
+  end.querySelector('[data-action="sim"]').addEventListener('click', () => {
+    if (!t.actions.sim) return;
+    if (t.id === 'neutralisation') openScaleGame();
+  });
+  end.querySelector('[data-action="quiz"]').addEventListener('click', () => openQuiz(i));
+  end.querySelector('[data-action="skip"]').addEventListener('click', () => switchTopic(Math.min(i + 1, TOPICS.length - 1)));
+});
+
+/* ============== SCENE NAVIGATORS PER TOPIC ============== */
+const navigators = [];
+let currentTopic = 0;
+
+function buildDots(topicIndex) {
+  dotsEl.innerHTML = '';
+  const nav = navigators[topicIndex];
+  const total = nav.total;
+  for (let i = 0; i < total; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === nav.index ? ' active' : '');
+    dotsEl.appendChild(d);
+  }
+  dotsEl.style.setProperty('--accent', TOPICS[topicIndex].color);
+}
+
+TOPICS.forEach((t, i) => {
+  const container = document.querySelectorAll('.scene-container')[i];
+  const nav = createSceneNavigator({
+    container,
+    onChange: (idx) => {
+      if (currentTopic === i) {
+        Array.from(dotsEl.children).forEach((d, di) => d.classList.toggle('active', di === idx));
+        Progress.save(CHAPTER_ID, { ['scene_' + t.id]: idx });
+      }
+    }
+  });
+  navigators.push(nav);
+});
+
+function switchTopic(index) {
+  currentTopic = index;
+  document.querySelectorAll('.topic-view').forEach((v, i) => v.classList.toggle('active', i === index));
+  document.getElementById('progress-fill').style.width = `${((index + 1) / TOPICS.length) * 100}%`;
+  buildDots(index);
+  Progress.save(CHAPTER_ID, { currentTopic: index });
+  document.querySelectorAll('.scene-container')[index].focus();
+}
+
+// horizontal swipe to switch topics
+let touchStartX = null, touchStartY = null;
+document.getElementById('topics-root').addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+}, { passive: true });
+document.getElementById('topics-root').addEventListener('touchend', (e) => {
+  if (touchStartX === null) return;
+  const dx = touchStartX - e.changedTouches[0].clientX;
+  const dy = touchStartY - e.changedTouches[0].clientY;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+    switchTopic(dx > 0 ? Math.min(currentTopic + 1, TOPICS.length - 1) : Math.max(currentTopic - 1, 0));
+  }
+  touchStartX = null;
+}, { passive: true });
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowRight') switchTopic(Math.min(currentTopic + 1, TOPICS.length - 1));
+  if (e.key === 'ArrowLeft') switchTopic(Math.max(currentTopic - 1, 0));
+});
+
+// flip cards
+document.addEventListener('click', (e) => {
+  const card = e.target.closest('.flip-card');
+  if (card) card.classList.toggle('flipped');
+});
+
+// sour-sorting warm-up game
+let sortPlaced = 0;
+document.addEventListener('click', (e) => {
+  const item = e.target.closest('.sort-item');
+  if (!item || item.classList.contains('placed')) return;
+  if (item.dataset.sour === '1') {
+    item.classList.add('placed');
+    sortPlaced++;
+    const countEl = document.getElementById('basket-count');
+    if (countEl) countEl.textContent = `${sortPlaced} / 4`;
+    playBeep(500);
+    if (sortPlaced === 4) {
+      document.getElementById('sort-basket').classList.add('full');
+      setTimeout(() => document.getElementById('sort-reveal').classList.add('show'), 400);
+    }
+  } else {
+    item.classList.add('wrong-shake');
+    playBeep(180, 0.2, 'square');
+    setTimeout(() => item.classList.remove('wrong-shake'), 300);
+  }
+});
+
+// init
+const saved = Progress.get(CHAPTER_ID);
+switchTopic(saved.currentTopic || 0);
+
+/* ============== OVERLAY HELPERS ============== */
+document.querySelectorAll('[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => document.getElementById(btn.dataset.close).classList.remove('open'));
+});
+
+/* ============== pH DROPPER GAME ============== */
+const PH_SUBSTANCES = [
+  { name: 'Lemon', icon: '🍋', ph: 2, color: '#D11F1F' },
+  { name: 'Vinegar', icon: '🥗', ph: 3, color: '#E0432B' },
+  { name: 'Milk', icon: '🥛', ph: 6.5, color: '#D8D84A' },
+  { name: 'Water', icon: '💧', ph: 7, color: '#1DA0B8' },
+  { name: 'Baking Soda', icon: '🍰', ph: 9, color: '#2E7FCE' },
+  { name: 'Soap', icon: '🧼', ph: 10, color: '#5A3DE0' }
+];
+function initPhGame() {
+  const subEl = document.getElementById('ph-substances');
+  subEl.innerHTML = '';
+  PH_SUBSTANCES.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'substance';
+    el.draggable = true;
+    el.innerHTML = `${s.icon}<span>${s.name}</span>`;
+    el.addEventListener('click', () => dropSubstance(s));
+    subEl.appendChild(el);
+  });
+  const chart = document.getElementById('ph-chart');
+  chart.innerHTML = '';
+  ['#D11F1F','#E0432B','#EF6F1F','#EF9F27','#E8C547','#D8D84A','#9ACD32','#1DB88A','#1DA0B8','#2E7FCE','#3D5FE0','#5A3DE0','#7A2DCB','#9020A8'].forEach(c => {
+    const seg = document.createElement('div'); seg.className = 'seg'; seg.style.background = c; chart.appendChild(seg);
+  });
+}
+function dropSubstance(s) {
+  document.getElementById('ph-liquid').style.background = s.color;
+  document.getElementById('ph-meter').textContent = `pH ${s.ph}`;
+  const verdict = s.ph < 7 ? 'Acidic 🔴' : s.ph > 7 ? 'Basic 🔵' : 'Neutral ⚪';
+  document.getElementById('ph-feedback').textContent = `${s.name} → ${verdict}`;
+  playBeep(s.ph < 7 ? 300 : s.ph > 7 ? 600 : 440);
+}
+function openPhGame() { initPhGame(); document.getElementById('overlay-ph').classList.add('open'); }
+
+/* ============== ACID VS BASE FIGHT ============== */
+document.getElementById('fight-trigger').addEventListener('click', () => {
+  document.getElementById('fight-acid').classList.add('zap');
+  document.getElementById('fight-base').classList.add('zap');
+  document.getElementById('fight-equation').textContent = 'HCl + NaOH → NaCl + H₂O';
+  document.getElementById('fight-splash').classList.add('show');
+  playBeep(220, 0.3, 'square');
+  setTimeout(() => playBeep(660, 0.2), 200);
+  document.getElementById('fight-trigger').style.display = 'none';
+  document.getElementById('fight-reset').style.display = 'inline-flex';
+});
+document.getElementById('fight-reset').addEventListener('click', () => {
+  document.getElementById('fight-acid').classList.remove('zap');
+  document.getElementById('fight-base').classList.remove('zap');
+  document.getElementById('fight-equation').textContent = 'HCl + NaOH → ?';
+  document.getElementById('fight-splash').classList.remove('show');
+  document.getElementById('fight-trigger').style.display = 'inline-flex';
+  document.getElementById('fight-reset').style.display = 'none';
+});
+function openFightGame() { document.getElementById('overlay-fight').classList.add('open'); }
+
+/* ============== BALANCE SCALE ============== */
+let scaleLeft = 0, scaleRight = 0;
+function renderScale() {
+  document.getElementById('scale-left').innerHTML = Array(scaleLeft).fill('<div class="scale-mol acid">H⁺</div>').join('');
+  document.getElementById('scale-right').innerHTML = Array(scaleRight).fill('<div class="scale-mol base">OH⁻</div>').join('');
+  const diff = scaleLeft - scaleRight;
+  document.getElementById('scale-beam').style.transform = `rotate(${Math.max(-18, Math.min(18, diff * 6))}deg)`;
+  const status = document.getElementById('scale-status');
+  const resetBtn = document.getElementById('scale-reset');
+  if (scaleLeft > 0 && scaleLeft === scaleRight) {
+    status.textContent = '⚖️ Balanced! Neutralisation complete — water formed! 🎉';
+    resetBtn.style.display = 'inline-flex';
+    playBeep(523);
+  } else {
+    status.textContent = 'Add equal H⁺ and OH⁻ to balance!';
+    resetBtn.style.display = 'none';
+  }
+}
+document.querySelectorAll('.scale-tray .scale-mol').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if (btn.dataset.side === 'left') scaleLeft++; else scaleRight++;
+    renderScale();
+  });
+});
+document.getElementById('scale-reset').addEventListener('click', () => { scaleLeft = 0; scaleRight = 0; renderScale(); });
+function openScaleGame() { scaleLeft = 0; scaleRight = 0; renderScale(); document.getElementById('overlay-scale').classList.add('open'); }
+
+/* ============== QUIZ ============== */
+let quizState = null;
+function openQuiz(topicIndex) {
+  const questions = TOPICS[topicIndex].quiz;
+  quizState = { topicIndex, questions, current: 0, score: 0, timer: null, timeLeft: 10 };
+  document.getElementById('overlay-quiz').classList.add('open');
+  renderQuizQuestion();
+}
+function renderQuizQuestion() {
+  clearInterval(quizState.timer);
+  const { questions, current } = quizState;
+  if (current >= questions.length) { renderQuizScore(); return; }
+  const q = questions[current];
+  const card = document.getElementById('quiz-card');
+  card.innerHTML = `
+    <div class="quiz-progress">Question ${current + 1} / ${questions.length}</div>
+    <div class="timer-ring-wrap"><svg width="56" height="56" viewBox="0 0 56 56">
+      <circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="5"/>
+      <circle id="timer-ring" cx="28" cy="28" r="24" fill="none" stroke="${TOPICS[quizState.topicIndex].color}" stroke-width="5"
+        stroke-dasharray="151" stroke-dashoffset="0" transform="rotate(-90 28 28)"/>
+    </svg></div>
+    <div class="quiz-q">${q.q}</div>
+    <div class="quiz-options">${q.opts.map((o, i) => `<button class="quiz-opt" data-i="${i}">${o}</button>`).join('')}</div>
+  `;
+  card.querySelectorAll('.quiz-opt').forEach(btn => {
+    btn.addEventListener('click', () => answerQuiz(parseInt(btn.dataset.i)));
+  });
+  quizState.timeLeft = 10;
+  const ring = document.getElementById('timer-ring');
+  quizState.timer = setInterval(() => {
+    quizState.timeLeft -= 0.1;
+    const pct = Math.max(0, quizState.timeLeft / 10);
+    ring.setAttribute('stroke-dashoffset', 151 * (1 - pct));
+    if (quizState.timeLeft <= 0) { clearInterval(quizState.timer); answerQuiz(-1); }
+  }, 100);
+}
+function answerQuiz(selected) {
+  clearInterval(quizState.timer);
+  const q = quizState.questions[quizState.current];
+  const opts = document.querySelectorAll('.quiz-opt');
+  opts.forEach(o => o.style.pointerEvents = 'none');
+  if (selected === q.correct) {
+    opts[selected].classList.add('correct');
+    quizState.score++;
+    playBeep(660);
+  } else {
+    if (selected >= 0) opts[selected].classList.add('wrong');
+    opts[q.correct].classList.add('correct');
+    playBeep(180, 0.25, 'square');
+  }
+  setTimeout(() => { quizState.current++; renderQuizQuestion(); }, 900);
+}
+function renderQuizScore() {
+  const card = document.getElementById('quiz-card');
+  const { score, questions, topicIndex } = quizState;
+  card.innerHTML = `
+    <div class="quiz-score">${score} / ${questions.length}</div>
+    <p class="muted" style="margin-bottom:20px;">${score === questions.length ? 'Perfect score! 🎉' : score >= questions.length / 2 ? 'Good job! 👍' : 'Keep practicing! 💪'}</p>
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button class="btn btn-primary" id="quiz-retry">Try Again</button>
+      <button class="btn btn-primary" id="quiz-next" style="background:var(--surface); border:1px solid var(--border);">Next Topic</button>
+    </div>
+  `;
+  document.getElementById('quiz-retry').addEventListener('click', () => openQuiz(topicIndex));
+  document.getElementById('quiz-next').addEventListener('click', () => {
+    document.getElementById('overlay-quiz').classList.remove('open');
+    switchTopic(Math.min(topicIndex + 1, TOPICS.length - 1));
+  });
+}
+</script>
+</body>
+</html>

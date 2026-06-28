@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>learn. — Every concept, brought to life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/global.css">
+<style>
+  .hero {
+    position: relative;
+    z-index: 1;
+    min-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 20px 60px;
+  }
+  .hero .badge { margin-bottom: 24px; }
+  .hero h1 {
+    font-size: clamp(2.2rem, 7vw, 4.2rem);
+    line-height: 1.08;
+    max-width: 900px;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(90deg, var(--primary), var(--pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero p {
+    margin-top: 20px;
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    max-width: 540px;
+  }
+  .hero .btn { margin-top: 32px; font-size: 1rem; }
+
+  .stats {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+    gap: 16px;
+    text-align: center;
+  }
+  .stats .stat .num {
+    font-family: var(--font-head);
+    font-size: 1.8rem;
+    color: var(--primary);
+  }
+  .stats .stat .label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .subjects {
+    position: relative;
+    z-index: 1;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 40px 20px 100px;
+  }
+  .subjects h2 {
+    font-size: 1.6rem;
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .subject-card {
+    padding: 28px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .subject-card .icon { font-size: 2rem; margin-bottom: 14px; }
+  .subject-card h3 { font-size: 1.2rem; margin-bottom: 6px; }
+  .subject-card p { font-size: 0.85rem; color: var(--text-secondary); }
+  .subject-card .tag {
+    position: absolute;
+    top: 18px; right: 18px;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(29,184,138,0.15);
+    color: var(--teal);
+    border: 1px solid rgba(29,184,138,0.3);
+  }
+  .subject-card.soon .tag {
+    background: rgba(255,255,255,0.06);
+    color: var(--text-muted);
+    border-color: var(--border);
+  }
+
+  footer {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    padding: 30px 20px 50px;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 640px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<canvas id="particle-canvas"></canvas>
+
+<section class="hero">
+  <h1>Every concept, <span class="accent">brought to life.</span></h1>
+  <p>Visual, interactive, and fun. No boring textbook pages, just things you can play with.</p>
+  <a href="chapters/science.html" class="btn btn-primary">Start Learning →</a>
+</section>
+
+<section class="stats">
+  <div class="stat"><div class="num">4+</div><div class="label">Subjects</div></div>
+  <div class="stat"><div class="num">20+</div><div class="label">Chapters</div></div>
+  <div class="stat"><div class="num">100%</div><div class="label">Visual & Interactive</div></div>
+  <div class="stat"><div class="num">Free</div><div class="label">Always</div></div>
+</section>
+
+<section class="subjects">
+  <h2>Pick a subject</h2>
+  <div class="subject-grid">
+    <a class="card subject-card" href="chapters/science.html" style="border-color: rgba(108,99,255,0.3);">
+      <span class="tag">Live</span>
+      <div class="icon">🧪</div>
+      <h3>Science</h3>
+      <p>Class 7 to 10 — chemistry, biology, physics simulations and games.</p>
+    </a>
+    <div class="card subject-card soon">
+      <span class="tag">Coming soon</span>
+      <div class="icon">📐</div>
+      <h3>Maths</h3>
+      <p>Geometry, algebra and number theory you can actually see.</p>
+    </div>
+    <div class="card subject-card soon">
+      <span class="tag">Coming soon</span>
+      <div class="icon">🏛️</div>
+      <h3>History</h3>
+      <p>Timelines and stories that bring the past alive.</p>
+    </div>
+    <div class="card subject-card soon">
+      <span class="tag">Coming soon</span>
+      <div class="icon">📚</div>
+      <h3>English</h3>
+      <p>Grammar and literature made interactive.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Made with ❤️ by Ashutosh.
+</footer>
+
+<script src="assets/js/utils.js"></script>
+<script>initParticles('particle-canvas');</script>
+</body>
+</html>
