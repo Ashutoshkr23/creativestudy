@@ -98,21 +98,32 @@ const Progress = {
   }
 };
 
-// Vertical scroll-snap scene navigator with keyboard + swipe support
+// Stacked scene navigator — each scene slides up and covers the previous one,
+// rather than scrolling as one continuous page. Keyboard, swipe and wheel supported.
 function createSceneNavigator({ container, onChange }) {
   const scenes = Array.from(container.querySelectorAll('.scene'));
   let index = 0;
+  let animating = false;
+
+  function render() {
+    scenes.forEach((s, i) => {
+      s.style.transform = i <= index ? 'translateY(0)' : 'translateY(100%)';
+    });
+  }
+  render();
 
   function go(i) {
-    if (i < 0 || i >= scenes.length) return;
+    if (i < 0 || i >= scenes.length || i === index || animating) return;
+    animating = true;
     index = i;
-    scenes[index].scrollIntoView({ behavior: 'smooth' });
+    render();
     if (onChange) onChange(index, scenes.length);
+    setTimeout(() => { animating = false; }, 500);
   }
 
   container.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); go(index + 1); }
-    if (e.key === 'ArrowUp') { e.preventDefault(); go(index - 1); }
+    if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); go(index + 1); }
+    if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); go(index - 1); }
   });
 
   let touchStartY = null;
@@ -124,22 +135,15 @@ function createSceneNavigator({ container, onChange }) {
     touchStartY = null;
   }, { passive: true });
 
-  let scrollTimeout;
-  container.addEventListener('scroll', () => {
-    clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(() => {
-      const top = container.scrollTop;
-      let closest = 0, min = Infinity;
-      scenes.forEach((s, i) => {
-        const d = Math.abs(s.offsetTop - top);
-        if (d < min) { min = d; closest = i; }
-      });
-      if (closest !== index) {
-        index = closest;
-        if (onChange) onChange(index, scenes.length);
-      }
-    }, 100);
-  });
+  let wheelLocked = false;
+  container.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return; // let horizontal card rows scroll normally
+    e.preventDefault();
+    if (wheelLocked) return;
+    wheelLocked = true;
+    go(e.deltaY > 0 ? index + 1 : index - 1);
+    setTimeout(() => { wheelLocked = false; }, 800);
+  }, { passive: false });
 
   return { go, next: () => go(index + 1), prev: () => go(index - 1), get index() { return index; }, total: scenes.length };
 }
