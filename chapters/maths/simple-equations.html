@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Simple Equations — learn.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/global.css">
+<style>
+  html, body { height: 100%; overflow: hidden; }
+
+  /* ===== HEADER ===== */
+  .chapter-header {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(7,7,15,0.9); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .chapter-header .row {
+    display: flex; align-items: center; gap: 14px; padding: 12px 16px;
+  }
+  .chapter-header .back {
+    width: 34px; height: 34px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 999px; background: var(--surface); border: 1px solid var(--border);
+  }
+  .chapter-header h1 { font-size: 1rem; flex: 1; }
+  .progress-track { height: 3px; background: rgba(255,255,255,0.06); }
+  .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width .3s ease; }
+
+  /* ===== SCENES ===== */
+  .topic-view { display: none; position: fixed; top: var(--header-h, 60px); left: 0; right: 0; bottom: 0; }
+  .topic-view.active { display: block; }
+
+  .scene-container { height: 100%; position: relative; overflow: hidden; outline: none; }
+  .scene {
+    height: 100%; width: 100%; position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 80px 20px 40px; text-align: center;
+    background: var(--bg);
+    transform: translateY(100%);
+    transition: transform .5s cubic-bezier(.4,0,.2,1);
+    overflow-y: auto; overflow-x: hidden;
+  }
+  /* centers content when it fits, allows scrolling when it doesn't
+     (justify-content: center would make overflowing tops unreachable) */
+  .scene::before, .scene::after { content: ''; flex: 0 0 auto; margin: auto; }
+  .scene .eyebrow { font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent, var(--primary)); margin-bottom: 10px; font-weight: 600; }
+  .scene h2 { font-size: clamp(1.35rem, 5vw, 2rem); margin-bottom: 10px; max-width: 640px; }
+  .scene .explain { color: var(--text-secondary); max-width: 500px; font-size: 0.92rem; margin-bottom: 20px; }
+  .scroll-hint { position: absolute; bottom: 14px; left: 0; right: 0; font-size: 0.72rem; color: var(--text-muted); animation: hintBob 1.8s ease-in-out infinite; }
+  @keyframes hintBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+
+  .flip-card { perspective: 800px; }
+  .flip-inner { width: 100%; height: 100%; position: relative; transition: transform .6s; transform-style: preserve-3d; }
+  .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+  .flip-front, .flip-back {
+    position: absolute; inset: 0; backface-visibility: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 10px; border: 1px solid var(--border); background: var(--surface);
+  }
+  .flip-back { transform: rotateY(180deg); padding: 6px; text-align: center; color: var(--text-secondary); }
+
+  .game-btn {
+    padding: 11px 20px; border-radius: var(--radius-sm);
+    background: var(--surface); border: 1px solid var(--border);
+    font-family: var(--font-head); font-weight: 600; font-size: 0.88rem;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .game-btn:hover { border-color: var(--accent, var(--primary)); transform: translateY(-2px); }
+  .game-btn.primary { background: var(--accent, var(--primary)); border-color: transparent; color: #fff; }
+  .game-btn.danger { border-color: rgba(216,90,48,0.5); }
+  .game-btn:disabled { opacity: 0.35; pointer-events: none; }
+  .wrong-shake { animation: itemShake .3s ease; }
+  @keyframes itemShake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+
+  .msg-line { min-height: 22px; font-size: 0.85rem; color: var(--text-secondary); margin-top: 12px; transition: color .2s ease; }
+  .msg-line.good { color: var(--teal); font-weight: 600; }
+  .msg-line.bad { color: var(--coral); font-weight: 600; }
+
+  /* ===== 1. MIND READER ===== */
+  .mind-box { width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 22px; }
+  .mind-step { font-size: 1.15rem; font-family: var(--font-head); min-height: 60px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .mind-step .big-emoji { font-size: 1.6rem; }
+  .mind-input-row { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
+  .mind-input-row input {
+    width: 110px; padding: 11px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text); font-size: 1.1rem; text-align: center; font-family: var(--font-head);
+  }
+  .mind-input-row input:focus { outline: 1px solid var(--accent, var(--primary)); }
+  .mind-reveal { display: none; margin-top: 6px; }
+  .mind-reveal.show { display: block; animation: popIn .5s cubic-bezier(.2,1.4,.4,1); }
+  .mind-reveal .guessed { font-size: 3rem; font-family: var(--font-head); color: var(--accent, var(--primary)); text-shadow: 0 0 30px rgba(216,90,48,0.55); }
+  @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+  /* ===== 2. SECRET / STEP-THROUGH PANELS ===== */
+  .steps-panel { width: 100%; max-width: 460px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; }
+  .steps-panel .step-line {
+    display: none; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 14px; margin-bottom: 8px; border-radius: var(--radius-sm);
+    background: var(--surface-2); border: 1px solid var(--border); text-align: left;
+  }
+  .steps-panel .step-line.shown { display: flex; animation: slideIn .4s ease; }
+  .steps-panel .step-line .words { font-size: 0.78rem; color: var(--text-secondary); flex: 1; }
+  .steps-panel .step-line .math { font-family: var(--font-head); font-weight: 700; font-size: 1rem; color: var(--accent, var(--primary)); white-space: nowrap; }
+  @keyframes slideIn { 0% { transform: translateY(12px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+
+  /* ===== 3. MATCH GAME ===== */
+  .match-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 500px; }
+  .match-col { display: flex; flex-direction: column; gap: 10px; }
+  .match-item {
+    padding: 13px 10px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border);
+    font-size: 0.8rem; transition: border-color .2s ease, background .2s ease, opacity .3s ease;
+  }
+  .match-item .eq { font-family: var(--font-head); font-size: 1rem; font-weight: 700; }
+  .match-item.selected { border-color: var(--accent, var(--primary)); background: rgba(216,90,48,0.12); }
+  .match-item.done { opacity: 0.35; border-color: var(--teal); pointer-events: none; }
+
+  /* ===== 4. ANATOMY ===== */
+  .anatomy { display: flex; align-items: center; gap: 6px; font-family: var(--font-head); font-size: clamp(1.6rem, 7vw, 2.6rem); font-weight: 700; margin-bottom: 8px; }
+  .anatomy .lhs { color: var(--teal); }
+  .anatomy .rhs { color: var(--pink); }
+  .anatomy .eqs { color: var(--text); animation: eqPulse 2s ease-in-out infinite; }
+  @keyframes eqPulse { 0%,100% { transform: scale(1); text-shadow: none; } 50% { transform: scale(1.25); text-shadow: 0 0 18px rgba(108,99,255,0.8); } }
+  .anatomy-labels { display: flex; gap: 30px; margin-bottom: 22px; font-size: 0.72rem; }
+  .anatomy-labels .lab-l { color: var(--teal); }
+  .anatomy-labels .lab-r { color: var(--pink); }
+  .concept-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .concept-cards .flip-card { width: 150px; height: 130px; cursor: pointer; }
+  .concept-cards .flip-front { font-size: 0.85rem; font-weight: 600; gap: 6px; }
+  .concept-cards .flip-front .ic { font-size: 1.5rem; }
+  .concept-cards .flip-back { font-size: 0.7rem; line-height: 1.45; padding: 10px; }
+  .concept-cards .flip-back b { color: var(--accent, var(--primary)); }
+
+  /* ===== 5. EQUATION-OR-NOT SORT ===== */
+  .eqsort-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 480px; }
+  .eqsort-item {
+    padding: 16px 6px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border);
+    font-family: var(--font-head); font-weight: 700; font-size: 0.95rem;
+    transition: opacity .3s ease, transform .3s ease, border-color .2s ease; cursor: pointer;
+  }
+  .eqsort-item.placed { opacity: 0; transform: scale(0.4); pointer-events: none; }
+  .eqsort-basket {
+    margin: 0 auto 16px; display: flex; align-items: center; gap: 12px; padding: 12px 22px;
+    border: 2px dashed rgba(255,255,255,0.2); border-radius: 14px; width: fit-content; transition: border-color .3s ease;
+  }
+  .eqsort-basket.full { border-color: var(--accent); }
+  .eqsort-basket .cnt { font-family: var(--font-head); font-weight: 700; }
+  .eqsort-reveal { display: none; margin-top: 16px; font-size: 0.85rem; color: var(--teal); font-weight: 600; }
+  .eqsort-reveal.show { display: block; animation: popIn .5s ease; }
+
+  /* ===== 6. TRIAL & ERROR ===== */
+  .trial-eq { font-family: var(--font-head); font-size: 2rem; font-weight: 700; margin-bottom: 18px; }
+  .trial-chips { display: flex; gap: 10px; justify-content: center; margin-bottom: 18px; flex-wrap: wrap; }
+  .trial-chip {
+    width: 52px; height: 52px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border);
+    font-family: var(--font-head); font-size: 1.1rem; font-weight: 700;
+    transition: border-color .2s ease, background .2s ease, transform .15s ease;
+  }
+  .trial-chip:hover { transform: translateY(-3px); }
+  .trial-chip.tried { opacity: 0.4; }
+  .trial-chip.winner { background: var(--teal); border-color: transparent; color: #fff; opacity: 1; box-shadow: 0 0 20px rgba(29,184,138,0.5); }
+  .trial-work { min-height: 56px; font-family: var(--font-head); font-size: 1.15rem; }
+  .trial-work .calc { color: var(--text-secondary); }
+  .trial-work .verdict { display: block; margin-top: 6px; font-size: 0.9rem; }
+
+  /* ===== 7-8. BALANCE ===== */
+  .bal-stage { position: relative; width: 100%; max-width: 430px; height: 235px; margin-bottom: 4px; flex-shrink: 0; }
+  .bal-post { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 26px solid transparent; border-right: 26px solid transparent; border-bottom: 150px solid var(--surface-2); }
+  .bal-post::after { content: ''; position: absolute; top: 148px; left: -60px; width: 120px; height: 10px; background: var(--surface-2); border-radius: 4px; transform: translateY(0); }
+  .bal-beam { position: absolute; top: 78px; left: 50%; width: 340px; height: 9px; margin-left: -170px; background: linear-gradient(90deg, var(--accent, var(--teal)), rgba(255,255,255,0.25), var(--accent, var(--teal))); border-radius: 5px; transform-origin: center; transition: transform .6s cubic-bezier(.3,1.2,.4,1); z-index: 2; }
+  .bal-pivot { position: absolute; top: 70px; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; border-radius: 50%; background: #fff; z-index: 3; box-shadow: 0 0 10px rgba(255,255,255,0.4); }
+  .bal-pan { position: absolute; top: 88px; width: 132px; transition: transform .6s cubic-bezier(.3,1.2,.4,1); display: flex; flex-direction: column; align-items: center; }
+  .bal-pan .strings { width: 2px; height: 26px; background: rgba(255,255,255,0.25); }
+  .bal-pan .dish { width: 100%; min-height: 46px; background: var(--surface); border: 1px solid var(--border); border-radius: 0 0 16px 16px; border-top: 2px solid rgba(255,255,255,0.3); display: flex; flex-wrap: wrap; gap: 3px; align-items: flex-start; justify-content: center; padding: 5px 4px; }
+  .bal-pan.left { left: 50%; margin-left: -236px; }
+  .bal-pan.right { left: 50%; margin-left: 104px; }
+  .bal-chip-x { width: 30px; height: 30px; border-radius: 6px; background: var(--accent, var(--teal)); color: #fff; font-family: var(--font-head); font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.35); }
+  .bal-chip-1 { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-2); border: 1px solid rgba(255,255,255,0.28); color: var(--text-secondary); font-size: 0.62rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .bal-eq-label { font-family: var(--font-head); font-size: 1.4rem; font-weight: 700; margin-bottom: 6px; }
+  .bal-controls { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 480px; }
+  .bal-controls .game-btn { font-size: 0.76rem; padding: 9px 13px; }
+  .bal-win { display: none; margin-top: 10px; }
+  .bal-win.show { display: block; animation: popIn .5s ease; }
+  .bal-win .val { font-family: var(--font-head); font-size: 1.6rem; color: var(--teal); }
+
+  /* demo balance (intro scene) */
+  .bal-demo-note { display: flex; gap: 26px; justify-content: center; margin-top: 10px; font-size: 0.75rem; }
+  .bal-demo-note .n-l { color: var(--teal); }
+  .bal-demo-note .n-r { color: var(--pink); }
+  .demo-tilt .bal-beam { animation: demoTilt 5s ease-in-out infinite; }
+  .demo-tilt .bal-pan.left { animation: demoPanL 5s ease-in-out infinite; }
+  .demo-tilt .bal-pan.right { animation: demoPanR 5s ease-in-out infinite; }
+  @keyframes demoTilt { 0%, 15% { transform: rotate(0deg); } 30%, 55% { transform: rotate(-8deg); } 72%, 100% { transform: rotate(0deg); } }
+  @keyframes demoPanL { 0%, 15% { transform: translateY(0); } 30%, 55% { transform: translateY(22px); } 72%, 100% { transform: translateY(0); } }
+  @keyframes demoPanR { 0%, 15% { transform: translateY(0); } 30%, 55% { transform: translateY(-22px); } 72%, 100% { transform: translateY(0); } }
+
+  /* ===== 9. SOLVER GAME ===== */
+  .solver-eq { font-family: var(--font-head); font-size: 2rem; font-weight: 700; min-height: 48px; margin-bottom: 4px; transition: transform .3s ease; }
+  .solver-eq.morph { animation: eqMorph .5s ease; }
+  @keyframes eqMorph { 0% { transform: scale(0.85); opacity: 0.2; } 100% { transform: scale(1); opacity: 1; } }
+  .solver-mid { min-height: 26px; font-size: 0.95rem; color: var(--text-secondary); font-family: var(--font-head); margin-bottom: 14px; }
+  .solver-opts { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 320px; }
+  .solver-level-dots { display: flex; gap: 7px; justify-content: center; margin-bottom: 14px; }
+  .solver-level-dots span { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+  .solver-level-dots span.on { background: var(--accent, var(--amber)); }
+
+  /* ===== 10. TRANSPOSE ===== */
+  .trans-stage { width: 100%; max-width: 440px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 26px 18px 20px; margin-bottom: 16px; }
+  .trans-eq { font-family: var(--font-head); font-size: 1.9rem; font-weight: 700; min-height: 46px; }
+  .trans-eq .jump-term { display: inline-block; color: var(--amber); }
+  .trans-eq .jump-term.flying { animation: termJump .8s ease forwards; }
+  @keyframes termJump { 0% { transform: translate(0,0); } 50% { transform: translate(40px,-34px) rotate(12deg); } 100% { transform: translate(80px,0) rotate(0); } }
+  .trans-note { font-size: 0.8rem; color: var(--text-secondary); min-height: 36px; margin-top: 10px; }
+  .trans-note b { color: var(--amber); }
+
+  /* ===== 11. REVERSE BUILDER ===== */
+  .rev-eq { font-family: var(--font-head); font-size: 2.1rem; font-weight: 700; margin-bottom: 6px; min-height: 50px; }
+  .rev-eq.morph { animation: eqMorph .5s ease; }
+  .rev-history { min-height: 20px; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 16px; }
+  .rev-ops { display: flex; gap: 9px; justify-content: center; flex-wrap: wrap; }
+
+  /* ===== 12. WORD PROBLEM ===== */
+  .word-card { width: 100%; max-width: 460px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .word-card .story { font-size: 0.92rem; line-height: 1.55; color: var(--text-secondary); }
+  .word-card .story b { color: var(--text); }
+  .word-q { font-family: var(--font-head); font-weight: 700; font-size: 1rem; min-height: 26px; margin-bottom: 12px; }
+  .word-opts { display: flex; flex-direction: column; gap: 9px; width: 100%; max-width: 320px; }
+  .word-done { display: none; }
+  .word-done.show { display: block; animation: popIn .5s ease; }
+  .word-done .val { font-family: var(--font-head); font-size: 1.5rem; color: var(--teal); }
+
+  /* ===== 13. BOSS QUIZ ===== */
+  .quiz-box { width: 100%; max-width: 440px; }
+  .quiz-hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-family: var(--font-head); font-size: 0.85rem; }
+  .quiz-hud .streak { color: var(--amber); }
+  .quiz-timer-track { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.08); margin-bottom: 16px; overflow: hidden; }
+  .quiz-timer-fill { height: 100%; width: 100%; background: var(--accent, var(--pink)); border-radius: 3px; }
+  .quiz-timer-fill.running { transition: width linear; }
+  .quiz-q { font-family: var(--font-head); font-size: 1.15rem; font-weight: 700; min-height: 58px; margin-bottom: 14px; }
+  .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+  .quiz-opts .game-btn { font-size: 0.95rem; }
+  .quiz-opts .game-btn.correct { background: var(--teal); border-color: transparent; color: #fff; }
+  .quiz-opts .game-btn.incorrect { background: var(--coral); border-color: transparent; color: #fff; }
+  .quiz-start-panel, .quiz-result-panel { text-align: center; }
+  .quiz-result-panel { display: none; }
+  .quiz-result-panel .final-score { font-family: var(--font-head); font-size: 3rem; color: var(--accent, var(--pink)); }
+  .quiz-result-panel .best { font-size: 0.85rem; color: var(--text-secondary); margin: 8px 0 18px; }
+  .confetti-bit { position: fixed; top: -12px; width: 8px; height: 14px; z-index: 200; animation: confettiFall linear forwards; pointer-events: none; }
+  @keyframes confettiFall { 0% { transform: translateY(0) rotate(0); opacity: 1; } 100% { transform: translateY(105vh) rotate(720deg); opacity: 0.6; } }
+
+  /* ===== 14. FINISH ===== */
+  .recap-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 460px; margin-bottom: 22px; }
+  .recap-card { padding: 16px 12px; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border); text-align: left; }
+  .recap-card .ic { font-size: 1.4rem; margin-bottom: 8px; }
+  .recap-card h4 { font-size: 0.82rem; margin-bottom: 5px; }
+  .recap-card p { font-size: 0.68rem; color: var(--text-secondary); line-height: 1.45; }
+
+  @media (max-width: 480px) {
+    .bal-stage { transform: scale(0.76); transform-origin: center top; margin-bottom: -45px; }
+    .eqsort-grid { grid-template-columns: repeat(2, 1fr); }
+    .match-item { font-size: 0.72rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="chapter-header">
+  <div class="row">
+    <a href="../maths.html" class="back">←</a>
+    <h1>Simple Equations</h1>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+</header>
+
+<div id="topics-root"></div>
+
+<script src="../../assets/js/utils.js"></script>
+<script>
+const CHAPTER_ID = 'simple-equations';
+
+/* ============== TOPIC DATA ============== */
+const TOPICS = [
+  {
+    id: 'mind-reader', title: 'The Mind Reader', color: '#D85A30',
+    scenes: [
+      // 1 — the trick
+      `<div class="eyebrow">🔮 Magic Trick</div>
+       <h2>I can read your mind.</h2>
+       <p class="explain">Don't believe me? Follow the steps — do the maths in your head or on paper. Don't tell me your number!</p>
+       <div class="mind-box">
+         <div class="mind-step" id="mind-step"><span class="big-emoji">🧠</span> Think of any whole number.</div>
+         <div class="mind-input-row" id="mind-controls">
+           <button class="game-btn primary" id="mind-next">Done ✓</button>
+         </div>
+         <div class="mind-reveal" id="mind-reveal">
+           <p style="font-size:0.8rem; color:var(--text-secondary);">✨ Your number was…</p>
+           <div class="guessed" id="mind-guess">?</div>
+           <button class="game-btn" id="mind-replay" style="margin-top:12px;">Play again 🔁</button>
+         </div>
+       </div>
+       <div class="scroll-hint">▼ scroll for the secret</div>`,
+      // 2 — the secret
+      `<div class="eyebrow">🤫 The Secret</div>
+       <h2>The magic is… <span style="color:var(--accent)">algebra!</span></h2>
+       <p class="explain">Your secret number was hiding inside a box the whole time. Mathematicians call that box a <b style="color:var(--text)">variable</b> — we write it as <b style="color:var(--text)">x</b>.</p>
+       <div class="steps-panel" id="secret-panel">
+         <div class="step-line shown"><span class="words">Your secret number (I can't see it!)</span><span class="math">📦 = x</span></div>
+         <div class="step-line"><span class="words">"Add 5" — whatever the box is, plus 5</span><span class="math">x + 5</span></div>
+         <div class="step-line"><span class="words">"Double it"</span><span class="math">2(x + 5)</span></div>
+         <div class="step-line"><span class="words">You told me the result, say 16. Now I know:</span><span class="math">2(x + 5) = 16</span></div>
+         <div class="step-line"><span class="words">I just undo the steps: halve it, take away 5…</span><span class="math">x = 3 🎉</span></div>
+       </div>
+       <button class="game-btn primary" id="secret-next" style="margin-top:16px;">Next step →</button>`,
+      // 3 — words to equations
+      `<div class="eyebrow">🎮 Mini-game</div>
+       <h2>Turn words into maths</h2>
+       <p class="explain">Tap a sentence, then tap its matching equation. Match all 4!</p>
+       <div class="match-grid">
+         <div class="match-col" id="match-words">
+           <button class="match-item" data-pair="a">4 more than a number is 9</button>
+           <button class="match-item" data-pair="b">A number doubled gives 14</button>
+           <button class="match-item" data-pair="c">3 less than a number is 10</button>
+           <button class="match-item" data-pair="d">One-third of a number is 6</button>
+         </div>
+         <div class="match-col" id="match-eqs">
+           <button class="match-item" data-pair="c"><span class="eq">x − 3 = 10</span></button>
+           <button class="match-item" data-pair="a"><span class="eq">x + 4 = 9</span></button>
+           <button class="match-item" data-pair="d"><span class="eq">x ⁄ 3 = 6</span></button>
+           <button class="match-item" data-pair="b"><span class="eq">2x = 14</span></button>
+         </div>
+       </div>
+       <div class="msg-line" id="match-msg"></div>`
+    ]
+  },
+  {
+    id: 'what-is-equation', title: 'What is an Equation?', color: '#6C63FF',
+    scenes: [
+      // 4 — anatomy
+      `<div class="eyebrow">📖 Concept</div>
+       <h2>Anatomy of an equation</h2>
+       <p class="explain">An equation says: <b style="color:var(--text)">the left side and the right side are EQUAL.</b> Tap the cards below to learn each part.</p>
+       <div class="anatomy"><span class="lhs">4x + 5</span><span class="eqs">=</span><span class="rhs">65</span></div>
+       <div class="anatomy-labels"><span class="lab-l">LHS (Left Hand Side)</span><span class="lab-r">RHS (Right Hand Side)</span></div>
+       <div class="concept-cards">
+         <div class="flip-card"><div class="flip-inner">
+           <div class="flip-front"><span class="ic">📦</span>Variable</div>
+           <div class="flip-back">A quantity that can <b>vary</b> (take different values). Written with letters: <b>x, y, m, n…</b></div>
+         </div></div>
+         <div class="flip-card"><div class="flip-inner">
+           <div class="flip-front"><span class="ic">🧩</span>Expression</div>
+           <div class="flip-back">Variables + numbers joined by operations, like <b>4x + 5</b>. No equals sign yet!</div>
+         </div></div>
+         <div class="flip-card"><div class="flip-inner">
+           <div class="flip-front"><span class="ic">⚖️</span>Equation</div>
+           <div class="flip-back">A condition on a variable: two expressions with an <b>= sign</b> between them, like <b>4x + 5 = 65</b>.</div>
+         </div></div>
+       </div>`,
+      // 5 — equation or not
+      `<div class="eyebrow">🎮 Spot Check</div>
+       <h2>Equation… or not?</h2>
+       <p class="explain">A true equation needs a <b style="color:var(--text)">variable</b> AND an <b style="color:var(--text)">= sign</b>. Tap only the real equations!</p>
+       <div class="eqsort-basket" id="eqsort-basket"><span>⚖️</span><span class="cnt" id="eqsort-count">0 / 4</span><span style="font-size:0.72rem;color:var(--text-secondary)">equations found</span></div>
+       <div class="eqsort-grid" id="eqsort-grid">
+         <button class="eqsort-item" data-eq="1">5x + 3 = 13</button>
+         <button class="eqsort-item" data-eq="0">3x + 7</button>
+         <button class="eqsort-item" data-eq="1">2y − 1 = 9</button>
+         <button class="eqsort-item" data-eq="0">9 &gt; 4</button>
+         <button class="eqsort-item" data-eq="1">m ⁄ 2 = 7</button>
+         <button class="eqsort-item" data-eq="0">10 = 5 + 5</button>
+         <button class="eqsort-item" data-eq="1">3n + 1 = 10</button>
+         <button class="eqsort-item" data-eq="0">7 − p</button>
+       </div>
+       <div class="eqsort-reveal" id="eqsort-reveal">Perfect! 🎉 No variable or no "=" sign → not an equation.</div>
+       <div class="msg-line" id="eqsort-msg"></div>`,
+      // 6 — trial and error
+      `<div class="eyebrow">🔍 Solution Hunt</div>
+       <h2>Which value of x works?</h2>
+       <p class="explain">The value that makes LHS = RHS is called the <b style="color:var(--text)">solution</b>. Try each value and watch the maths!</p>
+       <div class="trial-eq">3x + 2 = 11</div>
+       <div class="trial-chips" id="trial-chips">
+         <button class="trial-chip" data-v="1">1</button>
+         <button class="trial-chip" data-v="2">2</button>
+         <button class="trial-chip" data-v="3">3</button>
+         <button class="trial-chip" data-v="4">4</button>
+         <button class="trial-chip" data-v="5">5</button>
+       </div>
+       <div class="trial-work" id="trial-work"><span class="calc">Tap a value to test it…</span></div>`
+    ]
+  },
+  {
+    id: 'balance', title: 'The Balance', color: '#1DB88A',
+    scenes: [
+      // 7 — balance intro
+      `<div class="eyebrow">⚖️ Big Idea</div>
+       <h2>An equation is a balance</h2>
+       <p class="explain">LHS sits on the left pan, RHS on the right pan. The "=" sign means <b style="color:var(--text)">perfectly balanced</b>. Disturb one side only, and it tips!</p>
+       <div class="bal-stage demo-tilt">
+         <div class="bal-beam"></div>
+         <div class="bal-pivot"></div>
+         <div class="bal-post"></div>
+         <div class="bal-pan left"><div class="strings"></div><div class="dish"><span class="bal-chip-x">x</span><span class="bal-chip-1">1</span><span class="bal-chip-1">1</span><span class="bal-chip-1">1</span></div></div>
+         <div class="bal-pan right"><div class="strings"></div><div class="dish"><span class="bal-chip-1">1</span><span class="bal-chip-1">1</span><span class="bal-chip-1">1</span><span class="bal-chip-1">1</span><span class="bal-chip-1">1</span><span class="bal-chip-1">1</span><span class="bal-chip-1">1</span></div></div>
+       </div>
+       <div class="bal-demo-note"><span class="n-l">LHS: x + 3</span><span class="n-r">RHS: 7</span></div>
+       <div style="margin-top:16px; max-width:420px;" class="flip-card" id="golden-rule-card">
+         <div class="flip-inner" style="height:74px;">
+           <div class="flip-front" style="font-size:0.9rem; font-weight:600;">🏆 Tap for the GOLDEN RULE of equations</div>
+           <div class="flip-back" style="font-size:0.85rem;">Whatever you do to one side, <b>do exactly the same to the other side</b> — and it stays balanced!</div>
+         </div>
+       </div>`,
+      // 8 — balance simulator
+      `<div class="eyebrow">🕹️ Simulator</div>
+       <h2 id="bal-title">Find the weight of the box!</h2>
+       <div class="bal-eq-label" id="bal-eq">x + 3 = 7</div>
+       <div class="bal-stage" id="bal-stage">
+         <div class="bal-beam" id="bal-beam"></div>
+         <div class="bal-pivot"></div>
+         <div class="bal-post"></div>
+         <div class="bal-pan left" id="bal-pan-l"><div class="strings"></div><div class="dish" id="bal-dish-l"></div></div>
+         <div class="bal-pan right" id="bal-pan-r"><div class="strings"></div><div class="dish" id="bal-dish-r"></div></div>
+       </div>
+       <div class="bal-controls" id="bal-controls">
+         <button class="game-btn" data-op="sub-both">➖ Take 1 from BOTH</button>
+         <button class="game-btn" data-op="half-both">➗ Halve BOTH sides</button>
+         <button class="game-btn danger" data-op="sub-left">😈 Take 1 from LEFT only</button>
+         <button class="game-btn danger" data-op="sub-right">😈 Take 1 from RIGHT only</button>
+         <button class="game-btn" data-op="reset">🔄 Reset</button>
+       </div>
+       <div class="msg-line" id="bal-msg">Goal: leave ONE box alone on the left pan.</div>
+       <div class="bal-win" id="bal-win">
+         <div class="val" id="bal-win-val">📦 x = 4</div>
+         <button class="game-btn primary" id="bal-next-level" style="margin-top:10px;">Next level →</button>
+       </div>`
+    ]
+  },
+  {
+    id: 'solving', title: 'Solving Equations', color: '#EF9F27',
+    scenes: [
+      // 9 — solver game
+      `<div class="eyebrow">🎮 Solve It</div>
+       <h2>Pick the right move</h2>
+       <p class="explain">Use the golden rule — choose what to do to <b style="color:var(--text)">both sides</b> until x stands alone.</p>
+       <div class="solver-level-dots" id="solver-dots"><span class="on"></span><span></span><span></span></div>
+       <div class="solver-eq" id="solver-eq">x + 4 = 9</div>
+       <div class="solver-mid" id="solver-mid"></div>
+       <div class="solver-opts" id="solver-opts"></div>
+       <div class="msg-line" id="solver-msg"></div>`,
+      // 10 — transposing
+      `<div class="eyebrow">⚡ Shortcut</div>
+       <h2>Transposing — the term that jumps</h2>
+       <p class="explain">Instead of writing "subtract 5 from both sides", just move the term across the "=" — <b style="color:var(--text)">its sign flips as it jumps!</b></p>
+       <div class="trans-stage">
+         <div class="trans-eq" id="trans-eq">2x <span class="jump-term" id="jump-term">+ 5</span> = 11</div>
+         <div class="trans-note" id="trans-note">The <b>+ 5</b> is about to jump over the equals sign…</div>
+       </div>
+       <button class="game-btn primary" id="trans-next">Watch it jump →</button>`,
+      // 11 — reverse builder
+      `<div class="eyebrow">🏗️ Reverse Challenge</div>
+       <h2>Build equations from a solution</h2>
+       <p class="explain">Start from <b style="color:var(--text)">x = 5</b> and apply moves to BOTH sides. One solution can wear many disguises!</p>
+       <div class="rev-eq" id="rev-eq">x = 5</div>
+       <div class="rev-history" id="rev-history">no moves yet</div>
+       <div class="rev-ops" id="rev-ops">
+         <button class="game-btn" data-op="mul2">× 2 both sides</button>
+         <button class="game-btn" data-op="add3">+ 3 both sides</button>
+         <button class="game-btn" data-op="sub1">− 1 both sides</button>
+         <button class="game-btn" data-op="restart">🔄 Start again</button>
+       </div>
+       <div class="msg-line" id="rev-msg"></div>`
+    ]
+  },
+  {
+    id: 'real-life', title: 'Equations in Real Life', color: '#D4537E',
+    scenes: [
+      // 12 — word problem
+      `<div class="eyebrow">🌍 Real Life</div>
+       <h2>Crack a story problem</h2>
+       <div class="word-card">
+         <p class="story">Raju's father is <b>44 years old</b>. He is <b>5 years more than 3 times</b> Raju's age. How old is Raju? 👨‍👦</p>
+       </div>
+       <div class="word-q" id="word-q">Step 1 — What should x stand for?</div>
+       <div class="word-opts" id="word-opts"></div>
+       <div class="msg-line" id="word-msg"></div>
+       <div class="word-done" id="word-done">
+         <div class="val">🎉 Raju is 13 years old!</div>
+         <p style="font-size:0.8rem; color:var(--text-secondary); margin-top:8px;">Story → equation → solution. That's the power of algebra!</p>
+       </div>`,
+      // 13 — boss quiz
+      `<div class="eyebrow">👑 Boss Level</div>
+       <h2>The Equation Boss</h2>
+       <div class="quiz-box">
+         <div class="quiz-start-panel" id="quiz-start-panel">
+           <p class="explain" style="margin:0 auto 18px;">8 questions · 20 seconds each · streaks earn bonus points. Ready?</p>
+           <button class="game-btn primary" id="quiz-start">⚔️ Start the battle</button>
+         </div>
+         <div id="quiz-play-panel" style="display:none;">
+           <div class="quiz-hud">
+             <span id="quiz-progress">Q 1/8</span>
+             <span class="streak" id="quiz-streak">🔥 streak 0</span>
+             <span id="quiz-score">0 pts</span>
+           </div>
+           <div class="quiz-timer-track"><div class="quiz-timer-fill" id="quiz-timer"></div></div>
+           <div class="quiz-q" id="quiz-q"></div>
+           <div class="quiz-opts" id="quiz-opts"></div>
+         </div>
+         <div class="quiz-result-panel" id="quiz-result-panel">
+           <p style="font-size:0.85rem; color:var(--text-secondary);">Final score</p>
+           <div class="final-score" id="quiz-final">0</div>
+           <div class="best" id="quiz-best"></div>
+           <div id="quiz-verdict" style="font-family:var(--font-head); font-weight:700; margin-bottom:16px;"></div>
+           <button class="game-btn primary" id="quiz-retry">Fight again ⚔️</button>
+         </div>
+       </div>`,
+      // 14 — finish
+      `<div class="eyebrow">🏁 Chapter Complete</div>
+       <h2>You're an equation solver now!</h2>
+       <p class="explain">The four big ideas to remember:</p>
+       <div class="recap-grid">
+         <div class="recap-card"><div class="ic">📦</div><h4>Variable</h4><p>A letter (x, y, m…) standing for an unknown number.</p></div>
+         <div class="recap-card"><div class="ic">⚖️</div><h4>Equation = Balance</h4><p>LHS = RHS. Both pans must weigh the same.</p></div>
+         <div class="recap-card"><div class="ic">🏆</div><h4>Golden Rule</h4><p>Whatever you do to one side, do the same to the other.</p></div>
+         <div class="recap-card"><div class="ic">⚡</div><h4>Transposing</h4><p>A term jumping across "=" flips its sign.</p></div>
+       </div>
+       <a href="../maths.html" class="btn btn-primary">Back to Maths 📐</a>`
+    ]
+  }
+];
+
+/* ============== HEADER HEIGHT SYNC ============== */
+function syncHeaderHeight() {
+  const h = document.querySelector('.chapter-header').offsetHeight;
+  document.documentElement.style.setProperty('--header-h', h + 'px');
+}
+syncHeaderHeight();
+window.addEventListener('resize', syncHeaderHeight);
+
+/* ============== RENDER ALL TOPICS AS ONE SCENE FLOW ============== */
+const rootEl = document.getElementById('topics-root');
+const view = document.createElement('div');
+view.className = 'topic-view active';
+
+const container = document.createElement('div');
+container.className = 'scene-container';
+container.tabIndex = 0;
+
+TOPICS.forEach(topic => {
+  topic.scenes.forEach(sceneHtml => {
+    const scene = document.createElement('div');
+    scene.className = 'scene';
+    scene.style.setProperty('--accent', topic.color);
+    scene.innerHTML = sceneHtml;
+    container.appendChild(scene);
+  });
+});
+
+view.appendChild(container);
+rootEl.appendChild(view);
+
+const progressFill = document.getElementById('progress-fill');
+const sceneNav = createSceneNavigator({
+  container,
+  onChange: (index, total) => {
+    progressFill.style.width = `${((index + 1) / total) * 100}%`;
+    Progress.save(CHAPTER_ID, { lastScene: index });
+  }
+});
+progressFill.style.width = `${(1 / sceneNav.total) * 100}%`;
+container.focus();
+
+// If the current scene's content is taller than the screen, let the wheel
+// scroll it instead of jumping scenes. Capture on the parent so this runs
+// before the navigator's wheel handler on the container.
+view.addEventListener('wheel', (e) => {
+  const scene = e.target.closest('.scene');
+  if (!scene || scene.scrollHeight <= scene.clientHeight + 1) return;
+  const atTop = scene.scrollTop <= 0;
+  const atBottom = scene.scrollTop + scene.clientHeight >= scene.scrollHeight - 1;
+  if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) e.stopPropagation();
+}, { capture: true });
+
+/* ============== SHARED: flip cards ============== */
+document.addEventListener('click', (e) => {
+  const card = e.target.closest('.flip-card');
+  if (card) card.classList.toggle('flipped');
+});
+
+/* ============== 1. MIND READER ============== */
+(() => {
+  const stepEl = document.getElementById('mind-step');
+  const controls = document.getElementById('mind-controls');
+  const reveal = document.getElementById('mind-reveal');
+  const guessEl = document.getElementById('mind-guess');
+  let stage = 0;
+
+  const STEPS = [
+    { icon: '🧠', text: 'Think of any whole number.' },
+    { icon: '➕', text: 'Add 5 to it.' },
+    { icon: '✖️', text: 'Now double the result.' },
+    { icon: '🗣️', text: 'Tell me your final answer!' }
+  ];
+
+  function renderStage() {
+    const s = STEPS[stage];
+    stepEl.innerHTML = `<span class="big-emoji">${s.icon}</span> ${s.text}`;
+    if (stage === STEPS.length - 1) {
+      controls.innerHTML = `<input type="number" id="mind-answer" placeholder="e.g. 16" inputmode="numeric">
+        <button class="game-btn primary" id="mind-guess-btn">Read my mind 🔮</button>`;
+    } else {
+      controls.innerHTML = `<button class="game-btn primary" id="mind-next">Done ✓</button>`;
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'mind-next') {
+      stage++;
+      renderStage();
+      playBeep(420 + stage * 60);
+    }
+    if (e.target.id === 'mind-guess-btn') {
+      const raw = document.getElementById('mind-answer').value;
+      const n = Number(raw);
+      if (raw === '' || Number.isNaN(n)) return;
+      if (n % 2 !== 0) {
+        stepEl.innerHTML = `<span class="big-emoji">🤨</span> Hmm, that can't be right — doubling always gives an even number. Check your maths!`;
+        playBeep(180, 0.2, 'square');
+        return;
+      }
+      const secret = n / 2 - 5;
+      guessEl.textContent = secret;
+      controls.style.display = 'none';
+      stepEl.style.display = 'none';
+      reveal.classList.add('show');
+      playBeep(660); setTimeout(() => playBeep(880), 140); setTimeout(() => playBeep(1100), 280);
+    }
+    if (e.target.id === 'mind-replay') {
+      stage = 0;
+      reveal.classList.remove('show');
+      controls.style.display = '';
+      stepEl.style.display = '';
+      renderStage();
+    }
+  });
+})();
+
+/* ============== 2. SECRET STEP-THROUGH ============== */
+(() => {
+  const panel = document.getElementById('secret-panel');
+  const btn = document.getElementById('secret-next');
+  const lines = Array.from(panel.querySelectorAll('.step-line'));
+  let shown = 1;
+  btn.addEventListener('click', () => {
+    if (shown < lines.length) {
+      lines[shown].classList.add('shown');
+      shown++;
+      playBeep(500 + shown * 40);
+      if (shown === lines.length) btn.textContent = 'Mind = blown 🤯';
+    }
+  });
+})();
+
+/* ============== 3. WORDS → EQUATIONS MATCH ============== */
+(() => {
+  const msg = document.getElementById('match-msg');
+  let selectedWord = null;
+  let matched = 0;
+
+  document.addEventListener('click', (e) => {
+    const item = e.target.closest('.match-item');
+    if (!item || item.classList.contains('done')) return;
+    const inWords = item.parentElement.id === 'match-words';
+
+    if (inWords) {
+      document.querySelectorAll('#match-words .match-item').forEach(i => i.classList.remove('selected'));
+      item.classList.add('selected');
+      selectedWord = item;
+      return;
+    }
+    // tapped an equation
+    if (!selectedWord) {
+      msg.textContent = 'First tap a sentence on the left!';
+      msg.className = 'msg-line';
+      return;
+    }
+    if (item.dataset.pair === selectedWord.dataset.pair) {
+      item.classList.add('done');
+      selectedWord.classList.add('done');
+      selectedWord.classList.remove('selected');
+      selectedWord = null;
+      matched++;
+      playBeep(600 + matched * 80);
+      msg.textContent = matched === 4 ? '🎉 All matched! Words ARE maths.' : `Nice! ${matched} / 4 matched.`;
+      msg.className = 'msg-line good';
+    } else {
+      item.classList.add('wrong-shake');
+      playBeep(180, 0.2, 'square');
+      setTimeout(() => item.classList.remove('wrong-shake'), 300);
+      msg.textContent = 'Not that one — read the sentence again. 🤔';
+      msg.className = 'msg-line bad';
+    }
+  });
+})();
+
+/* ============== 5. EQUATION-OR-NOT SORT ============== */
+(() => {
+  const grid = document.getElementById('eqsort-grid');
+  const msg = document.getElementById('eqsort-msg');
+  let found = 0;
+
+  // shuffle
+  const items = Array.from(grid.children);
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  items.forEach(it => grid.appendChild(it));
+
+  grid.addEventListener('click', (e) => {
+    const item = e.target.closest('.eqsort-item');
+    if (!item || item.classList.contains('placed')) return;
+    if (item.dataset.eq === '1') {
+      item.classList.add('placed');
+      found++;
+      document.getElementById('eqsort-count').textContent = `${found} / 4`;
+      playBeep(520 + found * 70);
+      if (found === 4) {
+        document.getElementById('eqsort-basket').classList.add('full');
+        document.getElementById('eqsort-reveal').classList.add('show');
+        msg.textContent = '';
+      }
+    } else {
+      item.classList.add('wrong-shake');
+      playBeep(180, 0.2, 'square');
+      setTimeout(() => item.classList.remove('wrong-shake'), 300);
+      const t = item.textContent;
+      msg.textContent = t.includes('=') ? `"${t}" has no variable — nothing unknown to find!` : `"${t}" has no equals sign — it's just an expression.`;
+      msg.className = 'msg-line bad';
+    }
+  });
+})();
+
+/* ============== 6. TRIAL & ERROR ============== */
+(() => {
+  const work = document.getElementById('trial-work');
+  document.getElementById('trial-chips').addEventListener('click', (e) => {
+    const chip = e.target.closest('.trial-chip');
+    if (!chip) return;
+    const v = Number(chip.dataset.v);
+    const lhs = 3 * v + 2;
+    chip.classList.add('tried');
+    if (lhs === 11) {
+      chip.classList.add('winner');
+      work.innerHTML = `<span class="calc">3 × ${v} + 2 = <b style="color:var(--teal)">11</b> ✓</span><span class="verdict" style="color:var(--teal)">LHS = RHS — x = ${v} is the SOLUTION! 🎉</span>`;
+      playBeep(660); setTimeout(() => playBeep(990), 150);
+    } else {
+      work.innerHTML = `<span class="calc">3 × ${v} + 2 = <b style="color:var(--coral)">${lhs}</b> ≠ 11</span><span class="verdict" style="color:var(--text-secondary)">Not balanced… try another value.</span>`;
+      playBeep(240, 0.15, 'square');
+    }
+  });
+})();
+
+/* ============== 8. BALANCE SIMULATOR ============== */
+(() => {
+  const LEVELS = [
+    { eq: 'x + 3 = 7', x: 4, left: { x: 1, u: 3 }, right: { u: 7 } },
+    { eq: '2x = 8',    x: 4, left: { x: 2, u: 0 }, right: { u: 8 } },
+    { eq: '2x + 1 = 7',x: 3, left: { x: 2, u: 1 }, right: { u: 7 } }
+  ];
+  let li = 0, state, busy = false;
+
+  const beam = document.getElementById('bal-beam');
+  const panL = document.getElementById('bal-pan-l');
+  const panR = document.getElementById('bal-pan-r');
+  const dishL = document.getElementById('bal-dish-l');
+  const dishR = document.getElementById('bal-dish-r');
+  const msg = document.getElementById('bal-msg');
+  const winBox = document.getElementById('bal-win');
+
+  function loadLevel(i) {
+    const lv = LEVELS[i];
+    state = { x: lv.left.x, u: lv.left.u, ru: lv.right.u };
+    document.getElementById('bal-eq').textContent = lv.eq;
+    document.getElementById('bal-title').textContent = `Level ${i + 1} — find the weight of the box!`;
+    winBox.classList.remove('show');
+    setMsg('Goal: leave ONE box alone on the left pan.', '');
+    render();
+  }
+
+  function chips(x, u) {
+    let h = '';
+    for (let i = 0; i < x; i++) h += '<span class="bal-chip-x">x</span>';
+    for (let i = 0; i < u; i++) h += '<span class="bal-chip-1">1</span>';
+    return h;
+  }
+
+  function render() {
+    const xVal = LEVELS[li].x;
+    dishL.innerHTML = chips(state.x, state.u);
+    dishR.innerHTML = chips(0, state.ru);
+    const L = state.x * xVal + state.u;
+    const R = state.ru;
+    const a = Math.max(-11, Math.min(11, (R - L) * 3));
+    beam.style.transform = `rotate(${a}deg)`;
+    panL.style.transform = `translateY(${(-2.8 * a).toFixed(1)}px)`;
+    panR.style.transform = `translateY(${(2.8 * a).toFixed(1)}px)`;
+  }
+
+  function setMsg(text, cls) { msg.textContent = text; msg.className = 'msg-line ' + cls; }
+
+  function checkWin() {
+    if (state.x === 1 && state.u === 0) {
+      const v = state.ru;
+      document.getElementById('bal-win-val').textContent = `📦 x = ${v} — the box weighs ${v}!`;
+      winBox.classList.add('show');
+      document.getElementById('bal-next-level').style.display = li < LEVELS.length - 1 ? '' : 'none';
+      setMsg(li < LEVELS.length - 1 ? 'Balanced and solved! 🏆' : 'All levels cleared — you ARE the balance master! 🏆', 'good');
+      playBeep(660); setTimeout(() => playBeep(880), 130); setTimeout(() => playBeep(1180), 260);
+    }
+  }
+
+  document.getElementById('bal-controls').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-op]');
+    if (!btn || busy) return;
+    const op = btn.dataset.op;
+
+    if (op === 'reset') { loadLevel(li); playBeep(320); return; }
+    if (winBox.classList.contains('show')) return;
+
+    if (op === 'sub-both') {
+      if (state.u < 1) { setMsg('No loose "1" weight on the LEFT pan to remove!', 'bad'); playBeep(200, 0.15, 'square'); return; }
+      if (state.ru < 1) { setMsg('No weight left on the RIGHT pan!', 'bad'); return; }
+      state.u--; state.ru--;
+      render(); setMsg('Removed 1 from both sides — still balanced! ✓', 'good'); playBeep(520);
+      checkWin();
+    }
+    if (op === 'half-both') {
+      if (state.x % 2 !== 0 || state.u % 2 !== 0 || state.ru % 2 !== 0) {
+        setMsg("Can't split fairly — one side wouldn't halve into whole pieces!", 'bad'); playBeep(200, 0.15, 'square'); return;
+      }
+      state.x /= 2; state.u /= 2; state.ru /= 2;
+      render(); setMsg('Halved both sides — still balanced! ✓', 'good'); playBeep(560);
+      checkWin();
+    }
+    if (op === 'sub-left' || op === 'sub-right') {
+      const snapshot = { ...state };
+      if (op === 'sub-left') {
+        if (state.u < 1) { setMsg('No loose "1" weight on the left pan.', 'bad'); return; }
+        state.u--;
+      } else {
+        if (state.ru < 1) { setMsg('No weight on the right pan.', 'bad'); return; }
+        state.ru--;
+      }
+      busy = true;
+      render();
+      setMsg('😱 The balance TIPPED! An equation must treat both sides equally. Undoing…', 'bad');
+      playBeep(160, 0.3, 'square');
+      setTimeout(() => { state = snapshot; render(); setMsg('Phew — back in balance. Stick to the golden rule!', ''); busy = false; }, 1600);
+    }
+  });
+
+  document.getElementById('bal-next-level').addEventListener('click', () => { li++; loadLevel(li); });
+  loadLevel(0);
+})();
+
+/* ============== 9. SOLVER GAME ============== */
+(() => {
+  const LEVELS = [
+    { start: 'x + 4 = 9', steps: [
+      { opts: ['Subtract 4 from both sides', 'Add 4 to both sides', 'Divide both sides by 4'], correct: 0, mid: 'x + 4 − 4  =  9 − 4', result: 'x = 5' }
+    ]},
+    { start: '3x = 12', steps: [
+      { opts: ['Subtract 3 from both sides', 'Divide both sides by 3', 'Multiply both sides by 3'], correct: 1, mid: '3x ÷ 3  =  12 ÷ 3', result: 'x = 4' }
+    ]},
+    { start: '2x − 3 = 7', steps: [
+      { opts: ['Add 3 to both sides', 'Divide both sides by 2', 'Subtract 7 from both sides'], correct: 0, mid: '2x − 3 + 3  =  7 + 3', result: '2x = 10' },
+      { opts: ['Subtract 2 from both sides', 'Add 10 to both sides', 'Divide both sides by 2'], correct: 2, mid: '2x ÷ 2  =  10 ÷ 2', result: 'x = 5' }
+    ]}
+  ];
+  let li = 0, si = 0;
+  const eqEl = document.getElementById('solver-eq');
+  const midEl = document.getElementById('solver-mid');
+  const optsEl = document.getElementById('solver-opts');
+  const msg = document.getElementById('solver-msg');
+  const dots = document.getElementById('solver-dots').children;
+
+  function renderStep() {
+    const step = LEVELS[li].steps[si];
+    optsEl.innerHTML = '';
+    step.opts.forEach((label, i) => {
+      const b = document.createElement('button');
+      b.className = 'game-btn';
+      b.textContent = label;
+      b.dataset.i = i;
+      optsEl.appendChild(b);
+    });
+  }
+
+  function loadLevel(i) {
+    si = 0;
+    eqEl.textContent = LEVELS[i].start;
+    eqEl.classList.remove('morph'); void eqEl.offsetWidth; eqEl.classList.add('morph');
+    midEl.textContent = '';
+    msg.textContent = '';
+    Array.from(dots).forEach((d, k) => d.classList.toggle('on', k <= i));
+    renderStep();
+  }
+
+  optsEl.addEventListener('click', (e) => {
+    const b = e.target.closest('.game-btn');
+    if (!b) return;
+    const step = LEVELS[li].steps[si];
+    if (Number(b.dataset.i) === step.correct) {
+      midEl.textContent = step.mid;
+      eqEl.textContent = step.result;
+      eqEl.classList.remove('morph'); void eqEl.offsetWidth; eqEl.classList.add('morph');
+      playBeep(640);
+      si++;
+      if (si < LEVELS[li].steps.length) {
+        msg.textContent = 'Yes! Keep going…';
+        msg.className = 'msg-line good';
+        renderStep();
+      } else if (li < LEVELS.length - 1) {
+        msg.textContent = '✅ Solved! Next equation…';
+        msg.className = 'msg-line good';
+        setTimeout(() => playBeep(900), 130);
+        optsEl.innerHTML = '';
+        setTimeout(() => { li++; loadLevel(li); midEl.textContent = ''; }, 1400);
+      } else {
+        msg.textContent = '🏆 All three solved — you have the golden touch!';
+        msg.className = 'msg-line good';
+        optsEl.innerHTML = '';
+        setTimeout(() => playBeep(900), 130); setTimeout(() => playBeep(1200), 260);
+      }
+    } else {
+      b.classList.add('wrong-shake');
+      playBeep(190, 0.18, 'square');
+      setTimeout(() => b.classList.remove('wrong-shake'), 300);
+      msg.textContent = 'Think: what move leaves x more alone?';
+      msg.className = 'msg-line bad';
+    }
+  });
+
+  loadLevel(0);
+})();
+
+/* ============== 10. TRANSPOSING ANIMATION ============== */
+(() => {
+  const eqEl = document.getElementById('trans-eq');
+  const note = document.getElementById('trans-note');
+  const btn = document.getElementById('trans-next');
+  let stage = 0;
+
+  btn.addEventListener('click', () => {
+    stage++;
+    if (stage === 1) {
+      const term = document.getElementById('jump-term');
+      term.classList.add('flying');
+      note.innerHTML = 'Jumping across the "="… watch the sign <b>flip from + to −</b>!';
+      playBeep(700, 0.2);
+      setTimeout(() => {
+        eqEl.innerHTML = '2x  =  11 <span class="jump-term">− 5</span>';
+        note.innerHTML = 'Landed! <b>+ 5</b> became <b>− 5</b> on the other side. So 2x = 6.';
+      }, 850);
+      btn.textContent = 'Next →';
+    } else if (stage === 2) {
+      eqEl.innerHTML = '2x  =  6';
+      note.innerHTML = 'Now the <b>× 2</b> jumps too — multiplication flips into <b>division</b>!';
+      btn.textContent = 'Make it jump →';
+    } else if (stage === 3) {
+      eqEl.innerHTML = 'x  =  6 <span class="jump-term">÷ 2</span>';
+      note.innerHTML = '…which means <b>x = 3</b>. Same answer as the long way, but faster ⚡';
+      btn.textContent = 'Show the answer →';
+      playBeep(700, 0.2);
+    } else if (stage === 4) {
+      eqEl.innerHTML = 'x  =  3 🎉';
+      note.innerHTML = '<b>Rule:</b> + ↔ −, and × ↔ ÷ when a term crosses the equals sign.';
+      btn.style.display = 'none';
+      playBeep(660); setTimeout(() => playBeep(990), 150);
+    }
+  });
+})();
+
+/* ============== 11. REVERSE BUILDER ============== */
+(() => {
+  const eqEl = document.getElementById('rev-eq');
+  const hist = document.getElementById('rev-history');
+  const msg = document.getElementById('rev-msg');
+  let leftStr = 'x', rightVal = 5, moves = [];
+
+  function refresh() {
+    eqEl.textContent = `${leftStr} = ${rightVal}`;
+    eqEl.classList.remove('morph'); void eqEl.offsetWidth; eqEl.classList.add('morph');
+    hist.textContent = moves.length ? 'moves: ' + moves.join(' → ') : 'no moves yet';
+    if (moves.length >= 3) {
+      msg.innerHTML = `Look! <b style="color:var(--text)">${leftStr} = ${rightVal}</b> looks scary, but its solution is still x = 5. One solution, many equations!`;
+      msg.className = 'msg-line good';
+    } else {
+      msg.textContent = '';
+    }
+  }
+
+  document.getElementById('rev-ops').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-op]');
+    if (!b) return;
+    const op = b.dataset.op;
+    if (op === 'restart') { leftStr = 'x'; rightVal = 5; moves = []; refresh(); playBeep(320); return; }
+    if (moves.length >= 3) { msg.textContent = 'Equation is scary enough — hit Start again! 🔄'; return; }
+    if (op === 'mul2') {
+      leftStr = (leftStr.includes('+') || leftStr.includes('−')) ? `2(${leftStr})` : (leftStr === 'x' ? '2x' : `2 × ${leftStr}`);
+      rightVal *= 2; moves.push('×2');
+    }
+    if (op === 'add3') { leftStr = `${leftStr} + 3`; rightVal += 3; moves.push('+3'); }
+    if (op === 'sub1') { leftStr = `${leftStr} − 1`; rightVal -= 1; moves.push('−1'); }
+    playBeep(480 + moves.length * 70);
+    refresh();
+  });
+})();
+
+/* ============== 12. WORD PROBLEM (guided) ============== */
+(() => {
+  const STAGES = [
+    { q: 'Step 1 — What should x stand for?', opts: ["Raju's age 👦", "Father's age 👨", 'The number 44'], correct: 0,
+      good: "Right! We always let x be the thing we're LOOKING for." },
+    { q: 'Step 2 — "5 more than 3 times Raju\'s age is 44." Which equation says that?', opts: ['3x + 5 = 44', '3x − 5 = 44', '5x + 3 = 44'], correct: 0,
+      good: '3 times x, then 5 more → 3x + 5. And that equals 44!' },
+    { q: 'Step 3 — Transpose the + 5. What do we get?', opts: ['3x = 49', '3x = 39', 'x = 44 − 3'], correct: 1,
+      good: '+5 jumps over and becomes −5: 3x = 44 − 5 = 39.' },
+    { q: 'Step 4 — Divide both sides by 3. So x = ?', opts: ['12', '14', '13'], correct: 2,
+      good: '39 ÷ 3 = 13.' }
+  ];
+  let stage = 0;
+  const qEl = document.getElementById('word-q');
+  const optsEl = document.getElementById('word-opts');
+  const msg = document.getElementById('word-msg');
+
+  function renderStage() {
+    const s = STAGES[stage];
+    qEl.textContent = s.q;
+    optsEl.innerHTML = '';
+    s.opts.forEach((label, i) => {
+      const b = document.createElement('button');
+      b.className = 'game-btn';
+      b.textContent = label;
+      b.dataset.i = i;
+      optsEl.appendChild(b);
+    });
+  }
+
+  optsEl.addEventListener('click', (e) => {
+    const b = e.target.closest('.game-btn');
+    if (!b) return;
+    const s = STAGES[stage];
+    if (Number(b.dataset.i) === s.correct) {
+      msg.textContent = '✓ ' + s.good;
+      msg.className = 'msg-line good';
+      playBeep(600 + stage * 90);
+      stage++;
+      if (stage < STAGES.length) {
+        setTimeout(renderStage, 900);
+      } else {
+        qEl.textContent = '';
+        optsEl.innerHTML = '';
+        document.getElementById('word-done').classList.add('show');
+        setTimeout(() => playBeep(880), 150); setTimeout(() => playBeep(1180), 300);
+      }
+    } else {
+      b.classList.add('wrong-shake');
+      playBeep(190, 0.18, 'square');
+      setTimeout(() => b.classList.remove('wrong-shake'), 300);
+      msg.textContent = 'Not quite — read the story once more. 🤔';
+      msg.className = 'msg-line bad';
+    }
+  });
+
+  renderStage();
+})();
+
+/* ============== 13. BOSS QUIZ ============== */
+(() => {
+  const QUESTIONS = [
+    { q: 'Solve:  x + 7 = 12', opts: ['5', '19', '7', '4'], correct: 0 },
+    { q: 'Solve:  4m = 28', opts: ['24', '8', '7', '32'], correct: 2 },
+    { q: 'Solve:  2x − 5 = 9', opts: ['2', '7', '4', '6'], correct: 1 },
+    { q: '"7 added to a number gives 15" as an equation:', opts: ['7x = 15', 'x − 7 = 15', 'x + 7 = 15', 'x + 15 = 7'], correct: 2 },
+    { q: 'One-third of a number is 8. The number is:', opts: ['24', '11', '5', '3'], correct: 0 },
+    { q: 'In  x − 3 = 11, transposing −3 gives:', opts: ['x = 11 − 3', 'x = 11 + 3', 'x = 3 − 11', '−3x = 11'], correct: 1 },
+    { q: 'Rahul scored x runs, Sachin scored 2x. Together 198. Rahul scored:', opts: ['99', '66', '132', '98'], correct: 1 },
+    { q: 'Which value satisfies  5p + 2 = 17 ?', opts: ['p = 5', 'p = 2', 'p = 4', 'p = 3'], correct: 3 }
+  ];
+  const TIME = 20;
+  let qi = 0, score = 0, streak = 0, timerId = null, answered = false;
+
+  const startPanel = document.getElementById('quiz-start-panel');
+  const playPanel = document.getElementById('quiz-play-panel');
+  const resultPanel = document.getElementById('quiz-result-panel');
+  const qEl = document.getElementById('quiz-q');
+  const optsEl = document.getElementById('quiz-opts');
+  const timerEl = document.getElementById('quiz-timer');
+
+  function hud() {
+    document.getElementById('quiz-progress').textContent = `Q ${Math.min(qi + 1, QUESTIONS.length)}/${QUESTIONS.length}`;
+    document.getElementById('quiz-streak').textContent = `🔥 streak ${streak}`;
+    document.getElementById('quiz-score').textContent = `${score} pts`;
+  }
+
+  function startTimer() {
+    timerEl.classList.remove('running');
+    timerEl.style.width = '100%';
+    void timerEl.offsetWidth;
+    timerEl.classList.add('running');
+    timerEl.style.transitionDuration = TIME + 's';
+    timerEl.style.width = '0%';
+    timerId = setTimeout(() => onAnswer(-1), TIME * 1000);
+  }
+
+  function renderQ() {
+    answered = false;
+    const item = QUESTIONS[qi];
+    qEl.textContent = item.q;
+    optsEl.innerHTML = '';
+    item.opts.forEach((label, i) => {
+      const b = document.createElement('button');
+      b.className = 'game-btn';
+      b.textContent = label;
+      b.dataset.i = i;
+      optsEl.appendChild(b);
+    });
+    hud();
+    startTimer();
+  }
+
+  function onAnswer(i) {
+    if (answered) return;
+    answered = true;
+    clearTimeout(timerId);
+    const item = QUESTIONS[qi];
+    const btns = Array.from(optsEl.children);
+    btns.forEach(b => b.style.pointerEvents = 'none');
+    if (btns[item.correct]) btns[item.correct].classList.add('correct');
+
+    if (i === item.correct) {
+      streak++;
+      score += 10 + (streak - 1) * 2;
+      playBeep(660); setTimeout(() => playBeep(880), 120);
+    } else {
+      if (i >= 0 && btns[i]) btns[i].classList.add('incorrect');
+      streak = 0;
+      playBeep(180, 0.25, 'square');
+    }
+    hud();
+    setTimeout(() => {
+      qi++;
+      if (qi < QUESTIONS.length) renderQ();
+      else showResult();
+    }, 1100);
+  }
+
+  function confetti() {
+    const colors = ['#6C63FF', '#1DB88A', '#EF9F27', '#D4537E', '#D85A30', '#ffffff'];
+    for (let i = 0; i < 80; i++) {
+      const bit = document.createElement('span');
+      bit.className = 'confetti-bit';
+      bit.style.left = Math.random() * 100 + 'vw';
+      bit.style.background = colors[Math.floor(Math.random() * colors.length)];
+      bit.style.animationDuration = (Math.random() * 1.6 + 1.6) + 's';
+      bit.style.animationDelay = (Math.random() * 0.8) + 's';
+      document.body.appendChild(bit);
+      setTimeout(() => bit.remove(), 4200);
+    }
+  }
+
+  function showResult() {
+    playPanel.style.display = 'none';
+    resultPanel.style.display = 'block';
+    document.getElementById('quiz-final').textContent = score;
+    const prev = Progress.get(CHAPTER_ID).bestScore || 0;
+    const best = Math.max(prev, score);
+    Progress.save(CHAPTER_ID, { bestScore: best });
+    document.getElementById('quiz-best').textContent = score >= prev && prev > 0 ? `🏅 New personal best! (old best: ${prev})` : `Personal best: ${best}`;
+    const v = document.getElementById('quiz-verdict');
+    if (score >= 90) { v.textContent = '👑 EQUATION LEGEND!'; confetti(); }
+    else if (score >= 60) { v.textContent = '⚔️ Boss defeated — great solving!'; confetti(); }
+    else if (score >= 30) { v.textContent = '🛡️ Good fight! Replay the balance level and try again.'; }
+    else { v.textContent = '🌱 The boss won this round — scroll back up and train!'; }
+  }
+
+  document.getElementById('quiz-start').addEventListener('click', () => {
+    startPanel.style.display = 'none';
+    playPanel.style.display = 'block';
+    qi = 0; score = 0; streak = 0;
+    renderQ();
+  });
+  document.getElementById('quiz-retry').addEventListener('click', () => {
+    resultPanel.style.display = 'none';
+    playPanel.style.display = 'block';
+    qi = 0; score = 0; streak = 0;
+    renderQ();
+  });
+  optsEl.addEventListener('click', (e) => {
+    const b = e.target.closest('.game-btn');
+    if (b) onAnswer(Number(b.dataset.i));
+  });
+})();
+</script>
+</body>
+</html>
