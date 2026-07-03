@@ -82,6 +82,7 @@
 <div class="wrap">
   <div class="tabs">
     <button class="tab active" data-panel="class7">Class 7</button>
+    <button class="tab" data-panel="class8">Class 8</button>
   </div>
 
   <!-- CLASS 7 -->
@@ -123,11 +124,59 @@
       </div>
     </div>
   </div>
+
+  <!-- CLASS 8 -->
+  <div class="panel" id="class8">
+    <div class="unit">
+      <div class="unit-label"><span class="unit-dot" style="background:var(--primary)"></span>Unit 1 — Numbers</div>
+      <div class="chapter-grid">
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--primary)"><h4>Rational Numbers</h4><span class="soon-label">Coming soon</span></div>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--primary)"><h4>Squares &amp; Square Roots</h4><span class="soon-label">Coming soon</span></div>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--primary)"><h4>Cubes &amp; Cube Roots</h4><span class="soon-label">Coming soon</span></div>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--primary)"><h4>Exponents &amp; Powers</h4><span class="soon-label">Coming soon</span></div>
+      </div>
+    </div>
+    <div class="unit">
+      <div class="unit-label"><span class="unit-dot" style="background:var(--teal)"></span>Unit 2 — Algebra</div>
+      <div class="chapter-grid">
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--teal)"><h4>Linear Equations in One Variable</h4><span class="soon-label">Coming soon</span></div>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--teal)"><h4>Algebraic Expressions &amp; Identities</h4><span class="soon-label">Coming soon</span></div>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--teal)"><h4>Factorisation</h4><span class="soon-label">Coming soon</span></div>
+      </div>
+    </div>
+    <div class="unit">
+      <div class="unit-label"><span class="unit-dot" style="background:var(--amber)"></span>Unit 3 — Geometry &amp; Mensuration</div>
+      <div class="chapter-grid">
+        <a href="maths/quadrilaterals.html" class="card chapter-card" style="border-left-color:var(--amber)">
+          <h4>Understanding Quadrilaterals</h4>
+          <div class="tags"><span>🕹️ Drag Toy</span><span>🎭 Riddles</span><span>🧪 Lab</span><span>⚡ Quiz</span></div>
+        </a>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--amber)"><h4>Mensuration</h4><span class="soon-label">Coming soon</span></div>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--amber)"><h4>Introduction to Graphs</h4><span class="soon-label">Coming soon</span></div>
+      </div>
+    </div>
+    <div class="unit">
+      <div class="unit-label"><span class="unit-dot" style="background:var(--pink)"></span>Unit 4 — Data &amp; Comparisons</div>
+      <div class="chapter-grid">
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--pink)"><h4>Data Handling</h4><span class="soon-label">Coming soon</span></div>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--pink)"><h4>Comparing Quantities</h4><span class="soon-label">Coming soon</span></div>
+        <div class="card chapter-card coming-soon" style="border-left-color:var(--pink)"><h4>Direct &amp; Inverse Proportions</h4><span class="soon-label">Coming soon</span></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="../assets/js/utils.js"></script>
 <script>
   initParticles('particle-canvas');
+
+  // class tabs
+  document.querySelector('.tabs').addEventListener('click', (e) => {
+    const tab = e.target.closest('.tab');
+    if (!tab) return;
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+    document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.id === tab.dataset.panel));
+  });
 </script>
 </body>
 </html>

@@ -234,9 +234,6 @@
   .quiz-box { width: 100%; max-width: 440px; }
   .quiz-hud { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-family: var(--font-head); font-size: 0.85rem; }
   .quiz-hud .streak { color: var(--amber); }
-  .quiz-timer-track { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.08); margin-bottom: 16px; overflow: hidden; }
-  .quiz-timer-fill { height: 100%; width: 100%; background: var(--accent, var(--pink)); border-radius: 3px; }
-  .quiz-timer-fill.running { transition: width linear; }
   .quiz-q { font-family: var(--font-head); font-size: 1.15rem; font-weight: 700; min-height: 58px; margin-bottom: 14px; }
   .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
   .quiz-opts .game-btn { font-size: 0.95rem; }
@@ -491,7 +488,7 @@ const TOPICS = [
        <h2>The Equation Boss</h2>
        <div class="quiz-box">
          <div class="quiz-start-panel" id="quiz-start-panel">
-           <p class="explain" style="margin:0 auto 18px;">8 questions · 20 seconds each · streaks earn bonus points. Ready?</p>
+           <p class="explain" style="margin:0 auto 18px;">8 questions · no time pressure · streaks earn bonus points. Ready?</p>
            <button class="game-btn primary" id="quiz-start">⚔️ Start the battle</button>
          </div>
          <div id="quiz-play-panel" style="display:none;">
@@ -500,7 +497,6 @@ const TOPICS = [
              <span class="streak" id="quiz-streak">🔥 streak 0</span>
              <span id="quiz-score">0 pts</span>
            </div>
-           <div class="quiz-timer-track"><div class="quiz-timer-fill" id="quiz-timer"></div></div>
            <div class="quiz-q" id="quiz-q"></div>
            <div class="quiz-opts" id="quiz-opts"></div>
          </div>
@@ -1087,30 +1083,18 @@ document.addEventListener('click', (e) => {
     { q: 'Rahul scored x runs, Sachin scored 2x. Together 198. Rahul scored:', opts: ['99', '66', '132', '98'], correct: 1 },
     { q: 'Which value satisfies  5p + 2 = 17 ?', opts: ['p = 5', 'p = 2', 'p = 4', 'p = 3'], correct: 3 }
   ];
-  const TIME = 20;
-  let qi = 0, score = 0, streak = 0, timerId = null, answered = false;
+  let qi = 0, score = 0, streak = 0, answered = false;
 
   const startPanel = document.getElementById('quiz-start-panel');
   const playPanel = document.getElementById('quiz-play-panel');
   const resultPanel = document.getElementById('quiz-result-panel');
   const qEl = document.getElementById('quiz-q');
   const optsEl = document.getElementById('quiz-opts');
-  const timerEl = document.getElementById('quiz-timer');
 
   function hud() {
     document.getElementById('quiz-progress').textContent = `Q ${Math.min(qi + 1, QUESTIONS.length)}/${QUESTIONS.length}`;
     document.getElementById('quiz-streak').textContent = `🔥 streak ${streak}`;
     document.getElementById('quiz-score').textContent = `${score} pts`;
-  }
-
-  function startTimer() {
-    timerEl.classList.remove('running');
-    timerEl.style.width = '100%';
-    void timerEl.offsetWidth;
-    timerEl.classList.add('running');
-    timerEl.style.transitionDuration = TIME + 's';
-    timerEl.style.width = '0%';
-    timerId = setTimeout(() => onAnswer(-1), TIME * 1000);
   }
 
   function renderQ() {
@@ -1126,13 +1110,11 @@ document.addEventListener('click', (e) => {
       optsEl.appendChild(b);
     });
     hud();
-    startTimer();
   }
 
   function onAnswer(i) {
     if (answered) return;
     answered = true;
-    clearTimeout(timerId);
     const item = QUESTIONS[qi];
     const btns = Array.from(optsEl.children);
     btns.forEach(b => b.style.pointerEvents = 'none');
