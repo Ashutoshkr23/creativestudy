@@ -92,5 +92,7 @@ export type Chapter = {
   emoji: string;
   color: string; // accent, one of the theme palette hexes
   description: string;
+  /** Trophy earned in My Lab when the chapter is completed. */
+  trophy?: { emoji: string; name: string; caption: string };
   scenes: Scene[];
 };

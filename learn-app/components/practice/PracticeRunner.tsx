@@ -13,11 +13,13 @@ export function PracticeRunner({
   accent,
   title,
   onExit,
+  exitLabel = "Practise again →",
 }: {
   questions: PracticeQuestion[];
   accent: string;
   title: string;
   onExit: () => void;
+  exitLabel?: string;
 }) {
   const sounds = useFeedbackSounds();
   const [index, setIndex] = useState(0);
@@ -103,7 +105,7 @@ export function PracticeRunner({
             className="rounded-btn px-6 py-3 font-head font-semibold text-white"
             style={{ background: accent }}
           >
-            Practise again →
+            {exitLabel}
           </button>
         </div>
       </main>

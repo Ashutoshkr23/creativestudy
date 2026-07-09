@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { listChapters, getChapter } from "@/content";
 import { getQuestionLabel } from "@/lib/question-bank";
-import { getChapterDashboard } from "@/lib/queries";
+import { getChapterDashboard, getRecentAttemptsAllStudents } from "@/lib/queries";
 import { isDbConfigured } from "@/lib/supabase";
+import { mostImproved } from "@/lib/review";
+import { todayString } from "@/lib/gamify";
 
 export default async function TeacherDashboard({
   searchParams,
@@ -16,6 +18,21 @@ export default async function TeacherDashboard({
   const { rows, mostMissed } = dbReady
     ? await getChapterDashboard(chapter.slug)
     : { rows: [], mostMissed: [] };
+
+  // Most-improved: single positive callout (self-comparison, never a leaderboard).
+  let improvedName: string | null = null;
+  let improvedStats: { pct: number; delta: number } | null = null;
+  if (dbReady) {
+    const since = new Date(Date.now() - 15 * 86_400_000).toISOString();
+    const winner = mostImproved(await getRecentAttemptsAllStudents(since), todayString());
+    if (winner) {
+      const student = rows.find((r) => r.student.id === winner.student_id)?.student;
+      if (student) {
+        improvedName = student.display_name;
+        improvedStats = { pct: winner.pct, delta: winner.delta };
+      }
+    }
+  }
 
   return (
     <main>
@@ -42,6 +59,13 @@ export default async function TeacherDashboard({
           ▶ Teach this chapter
         </Link>
       </div>
+
+      {improvedName && improvedStats && (
+        <p className="mb-6 rounded-card border border-teal/40 bg-teal/10 px-4 py-3 text-sm text-teal">
+          🌟 Most improved this week: <b>{improvedName}</b>
+          {` — ${improvedStats.pct}% correct, up ${improvedStats.delta} points on last week.`}
+        </p>
+      )}
 
       {!dbReady ? (
         <div className="rounded-card border border-amber/30 bg-amber/10 p-6 text-sm text-ink-secondary">

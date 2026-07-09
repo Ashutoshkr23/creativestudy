@@ -11,6 +11,7 @@ export const acidsBasesSaltsChapter: Chapter = {
   emoji: "🧪",
   color: "#d85a30",
   description: "Become a lab detective: identify mystery liquids, tame an acid, and crack the three-bottle case.",
+  trophy: { emoji: "💎", name: "Crystal Jar", caption: "Cracked the three-bottle case and mastered acids, bases and salts." },
   scenes: [
     {
       type: "concept",

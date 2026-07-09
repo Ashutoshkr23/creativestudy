@@ -9,6 +9,7 @@ export const demoChapter: Chapter = {
   emoji: "🧪",
   color: "#6c63ff",
   description: "A tiny tour of every kind of activity — try it before your first real chapter.",
+  trophy: { emoji: "🧪", name: "First Beaker", caption: "Completed the learn. tour — every scientist starts somewhere!" },
   scenes: [
     {
       type: "concept",

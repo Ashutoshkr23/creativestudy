@@ -166,13 +166,10 @@ export async function getProgressForStudent(studentId: string): Promise<Progress
   return data ?? [];
 }
 
-/**
- * Questions whose LATEST attempt by this student was wrong — their personal
- * re-practice deck. A later correct answer clears the mistake.
- */
-export async function getStudentMistakes(
+/** Full attempt history for a student, oldest first — feeds mistakes & spaced review. */
+export async function getAttemptHistory(
   studentId: string
-): Promise<{ chapter_slug: string; question_id: string }[]> {
+): Promise<{ chapter_slug: string; question_id: string; is_correct: boolean; created_at: string }[]> {
   const db = getDb();
   if (!db) return [];
   const { data, error } = await db
@@ -181,13 +178,38 @@ export async function getStudentMistakes(
     .eq("student_id", studentId)
     .order("created_at", { ascending: true });
   if (error) throw new Error(error.message);
+  return data ?? [];
+}
+
+/**
+ * Questions whose LATEST attempt by this student was wrong — their personal
+ * re-practice deck. A later correct answer clears the mistake.
+ */
+export async function getStudentMistakes(
+  studentId: string
+): Promise<{ chapter_slug: string; question_id: string }[]> {
+  const history = await getAttemptHistory(studentId);
   const latest = new Map<string, { chapter_slug: string; question_id: string; is_correct: boolean }>();
-  for (const a of data ?? []) {
+  for (const a of history) {
     latest.set(`${a.chapter_slug}|${a.question_id}`, a);
   }
   return [...latest.values()]
     .filter((a) => !a.is_correct)
     .map(({ chapter_slug, question_id }) => ({ chapter_slug, question_id }));
+}
+
+/** All students' attempts in the recent window — for the most-improved callout. */
+export async function getRecentAttemptsAllStudents(
+  sinceIso: string
+): Promise<{ student_id: string; is_correct: boolean; created_at: string }[]> {
+  const db = getDb();
+  if (!db) return [];
+  const { data, error } = await db
+    .from("attempt")
+    .select("student_id, is_correct, created_at")
+    .gte("created_at", sinceIso);
+  if (error) throw new Error(error.message);
+  return data ?? [];
 }
 
 export type DashboardRow = {

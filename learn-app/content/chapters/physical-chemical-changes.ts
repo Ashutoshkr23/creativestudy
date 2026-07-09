@@ -11,6 +11,7 @@ export const physicalChemicalChangesChapter: Chapter = {
   emoji: "🔄",
   color: "#1db88a",
   description: "Press the universe's UNDO button, grow crystals, race rust, and learn which changes can never go back.",
+  trophy: { emoji: "🛡️", name: "Rust-Proof Shield", caption: "Proved what rust needs, stopped it cold, and mastered every change." },
   scenes: [
     {
       type: "concept",
