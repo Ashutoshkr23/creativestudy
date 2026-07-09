@@ -29,28 +29,33 @@ function shuffle<T>(items: T[], seedText: string): T[] {
 export function MatchSceneView({ scene }: { scene: MatchScene }) {
   const sounds = useFeedbackSounds();
   const { next } = usePlayer();
-  const rightSide = useMemo(
-    () => shuffle(scene.pairs.map((p) => p.right), scene.id),
+  // Right-side slots are tracked by pair index, not by their text — several
+  // pairs can legitimately share the same right-side label (e.g. two salts
+  // both "Neutral salt"), and matching/keying by text would let solving one
+  // silently disable the other's only valid slot.
+  const rightOrder = useMemo(
+    () => shuffle(scene.pairs.map((_, i) => i), scene.id),
     [scene.pairs, scene.id]
   );
-  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
-  const [solved, setSolved] = useState<Set<string>>(new Set());
-  const [wrongFlash, setWrongFlash] = useState<string | null>(null);
+  const [selectedLeftIdx, setSelectedLeftIdx] = useState<number | null>(null);
+  const [solvedPairs, setSolvedPairs] = useState<Set<number>>(new Set());
+  const [usedRightSlots, setUsedRightSlots] = useState<Set<number>>(new Set());
+  const [wrongFlashIdx, setWrongFlashIdx] = useState<number | null>(null);
 
-  const done = solved.size === scene.pairs.length;
+  const done = solvedPairs.size === scene.pairs.length;
 
-  const pickRight = (right: string) => {
-    if (!selectedLeft || done) return;
-    const pair = scene.pairs.find((p) => p.left === selectedLeft);
-    if (pair?.right === right) {
+  const pickRight = (rightPairIdx: number) => {
+    if (selectedLeftIdx === null || done) return;
+    if (scene.pairs[selectedLeftIdx].right === scene.pairs[rightPairIdx].right) {
       sounds.correct();
-      setSolved((s) => new Set(s).add(selectedLeft));
+      setSolvedPairs((s) => new Set(s).add(selectedLeftIdx));
+      setUsedRightSlots((s) => new Set(s).add(rightPairIdx));
     } else {
       sounds.wrong();
-      setWrongFlash(right);
-      setTimeout(() => setWrongFlash(null), 400);
+      setWrongFlashIdx(rightPairIdx);
+      setTimeout(() => setWrongFlashIdx(null), 400);
     }
-    setSelectedLeft(null);
+    setSelectedLeftIdx(null);
   };
 
   const itemClass =
@@ -63,24 +68,24 @@ export function MatchSceneView({ scene }: { scene: MatchScene }) {
       <Explain>{scene.prompt}</Explain>
       <div className="grid w-full max-w-md grid-cols-2 gap-3">
         <div className="flex flex-col gap-2.5">
-          {scene.pairs.map((pair) => {
-            const isSolved = solved.has(pair.left);
+          {scene.pairs.map((pair, idx) => {
+            const isSolved = solvedPairs.has(idx);
             return (
               <button
-                key={pair.left}
+                key={idx}
                 disabled={isSolved}
                 onClick={() => {
                   sounds.tap();
-                  setSelectedLeft(pair.left);
+                  setSelectedLeftIdx(idx);
                 }}
                 className={`${itemClass} ${
                   isSolved
                     ? "border-teal/60 bg-teal/15 text-teal"
-                    : selectedLeft === pair.left
+                    : selectedLeftIdx === idx
                       ? "bg-surface-2"
                       : "border-line bg-surface hover:border-line-strong"
                 }`}
-                style={selectedLeft === pair.left ? { borderColor: "var(--accent)" } : undefined}
+                style={selectedLeftIdx === idx ? { borderColor: "var(--accent)" } : undefined}
               >
                 {pair.left}
               </button>
@@ -88,22 +93,22 @@ export function MatchSceneView({ scene }: { scene: MatchScene }) {
           })}
         </div>
         <div className="flex flex-col gap-2.5">
-          {rightSide.map((right) => {
-            const isSolved = scene.pairs.some((p) => p.right === right && solved.has(p.left));
+          {rightOrder.map((pairIdx) => {
+            const isUsed = usedRightSlots.has(pairIdx);
             return (
               <button
-                key={right}
-                disabled={isSolved}
-                onClick={() => pickRight(right)}
+                key={pairIdx}
+                disabled={isUsed}
+                onClick={() => pickRight(pairIdx)}
                 className={`${itemClass} ${
-                  isSolved
+                  isUsed
                     ? "border-teal/60 bg-teal/15 text-teal"
-                    : wrongFlash === right
+                    : wrongFlashIdx === pairIdx
                       ? "border-coral bg-coral/15"
                       : "border-line bg-surface hover:border-line-strong"
                 }`}
               >
-                {right}
+                {scene.pairs[pairIdx].right}
               </button>
             );
           })}

@@ -36,7 +36,7 @@ export function BookQuestionSceneView({ scene }: { scene: BookQuestionScene }) {
   return (
     <>
       <Eyebrow>{scene.eyebrow ?? "📖 Practice"}</Eyebrow>
-      <h2 className="mb-4 max-w-xl text-xl sm:text-2xl">{scene.prompt}</h2>
+      <h2 className="mb-4 max-w-xl whitespace-pre-line text-xl sm:text-2xl">{scene.prompt}</h2>
       {scene.image && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
