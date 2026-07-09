@@ -35,6 +35,11 @@ export function ChapterPlayer({ chapter }: { chapter: Chapter }) {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // Don't hijack arrows from sliders, dropdowns and text fields inside scenes.
+      const target = e.target as HTMLElement;
+      if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) {
+        return;
+      }
       if (e.key === "ArrowDown" || e.key === "PageDown") {
         e.preventDefault();
         next();
