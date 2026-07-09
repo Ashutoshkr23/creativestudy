@@ -6,6 +6,18 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["-y", "serve", "-l", "4173", "."],
       "port": 4173
+    },
+    {
+      "name": "thirty-days-mastery",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "thirty-days-mastery", "run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "learn-app",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "learn-app", "run", "dev", "--", "--port", "3100"],
+      "port": 3100
     }
   ]
 }
