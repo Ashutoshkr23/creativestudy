@@ -62,6 +62,20 @@ export default async function StudentHome() {
         </section>
       )}
 
+      <Link
+        href="/app/practice"
+        className="group mb-8 flex items-center gap-3 rounded-card border border-primary/40 bg-primary/10 p-4 transition-all hover:-translate-y-0.5 hover:border-primary"
+      >
+        <span className="text-3xl">🎯</span>
+        <div className="min-w-0">
+          <div className="font-head font-semibold">Practice Arena</div>
+          <div className="text-xs text-ink-secondary">
+            Build your own quiz — any chapter, your pace, +10 XP per correct answer.
+          </div>
+        </div>
+        <span className="ml-auto shrink-0 text-ink-muted transition-transform group-hover:translate-x-1">→</span>
+      </Link>
+
       <h2 className="mb-4 font-head text-lg">Your chapters</h2>
       <div className="flex flex-col gap-3">
         {chapters.map((chapter) => {

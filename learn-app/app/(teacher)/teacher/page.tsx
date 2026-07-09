@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { listChapters, getChapter, getQuestionLabel } from "@/content";
+import { listChapters, getChapter } from "@/content";
+import { getQuestionLabel } from "@/lib/question-bank";
 import { getChapterDashboard } from "@/lib/queries";
 import { isDbConfigured } from "@/lib/supabase";
 

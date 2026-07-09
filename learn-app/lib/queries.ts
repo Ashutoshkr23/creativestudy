@@ -166,6 +166,30 @@ export async function getProgressForStudent(studentId: string): Promise<Progress
   return data ?? [];
 }
 
+/**
+ * Questions whose LATEST attempt by this student was wrong — their personal
+ * re-practice deck. A later correct answer clears the mistake.
+ */
+export async function getStudentMistakes(
+  studentId: string
+): Promise<{ chapter_slug: string; question_id: string }[]> {
+  const db = getDb();
+  if (!db) return [];
+  const { data, error } = await db
+    .from("attempt")
+    .select("chapter_slug, question_id, is_correct, created_at")
+    .eq("student_id", studentId)
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(error.message);
+  const latest = new Map<string, { chapter_slug: string; question_id: string; is_correct: boolean }>();
+  for (const a of data ?? []) {
+    latest.set(`${a.chapter_slug}|${a.question_id}`, a);
+  }
+  return [...latest.values()]
+    .filter((a) => !a.is_correct)
+    .map(({ chapter_slug, question_id }) => ({ chapter_slug, question_id }));
+}
+
 export type DashboardRow = {
   student: StudentRow;
   progress: ProgressRow | null;
