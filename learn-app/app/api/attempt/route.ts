@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session";
 import { recordAttempt, updateProgress } from "@/lib/queries";
 import { isDbConfigured } from "@/lib/supabase";
 import { getChapter } from "@/content";
+import { SIGHT_WORDS_SLUG } from "@/content/sight-words";
 
 export async function POST(request: Request) {
   const session = await getSession();
@@ -20,7 +21,8 @@ export async function POST(request: Request) {
   const quizScore = Number.isFinite(body.quizScore) ? Number(body.quizScore) : undefined;
   const completed = Boolean(body.completed);
 
-  if (!getChapter(chapterSlug) || !questionId) {
+  // Sight-word practice tracks against a pseudo-chapter so XP/streaks accrue.
+  if ((!getChapter(chapterSlug) && chapterSlug !== SIGHT_WORDS_SLUG) || !questionId) {
     return NextResponse.json({ error: "Unknown chapter or question." }, { status: 400 });
   }
 
