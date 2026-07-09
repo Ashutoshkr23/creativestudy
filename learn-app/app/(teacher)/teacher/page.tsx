@@ -33,6 +33,13 @@ export default async function TeacherDashboard({
             {c.emoji} {c.title}
           </Link>
         ))}
+        <Link
+          href={`/app/chapter/${chapter.slug}`}
+          target="_blank"
+          className="ml-auto rounded-btn border border-line bg-surface px-4 py-1.5 text-sm text-ink-secondary transition-colors hover:border-line-strong hover:text-ink"
+        >
+          ▶ Teach this chapter
+        </Link>
       </div>
 
       {!dbReady ? (

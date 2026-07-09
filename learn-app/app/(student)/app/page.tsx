@@ -10,6 +10,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 export default async function StudentHome() {
   const session = await getSession();
   if (!session) redirect("/login");
+  if (session.role === "teacher") redirect("/teacher");
 
   const progress =
     session.role === "student" && session.studentId && isDbConfigured()
