@@ -10,6 +10,11 @@ import { HeatLab } from "./HeatLab";
 import { ReactionLab } from "./ReactionLab";
 import { RustLab } from "./RustLab";
 import { CrystalLab } from "./CrystalLab";
+import { AngleTuner } from "./AngleTuner";
+import { AnglePartners } from "./AnglePartners";
+import { ScissorsSim } from "./ScissorsSim";
+import { LetterHunt } from "./LetterHunt";
+import { ParallelTester } from "./ParallelTester";
 
 // Registry of bespoke interactive scenes. Content modules reference these by
 // name as { type: "custom", component: "<name>" }.
@@ -25,4 +30,9 @@ export const customComponents: Record<string, ComponentType<Record<string, unkno
   "reaction-lab": ReactionLab,
   "rust-lab": RustLab,
   "crystal-lab": CrystalLab,
+  "angle-tuner": AngleTuner,
+  "angle-partners": AnglePartners,
+  "scissors-sim": ScissorsSim,
+  "letter-hunt": LetterHunt,
+  "parallel-tester": ParallelTester,
 };

@@ -2,8 +2,14 @@ import type { Chapter } from "./types";
 import { demoChapter } from "./chapters/demo";
 import { acidsBasesSaltsChapter } from "./chapters/acids-bases-salts";
 import { physicalChemicalChangesChapter } from "./chapters/physical-chemical-changes";
+import { parallelIntersectingLinesChapter } from "./chapters/parallel-intersecting-lines";
 
-const chapters: Chapter[] = [demoChapter, acidsBasesSaltsChapter, physicalChemicalChangesChapter];
+const chapters: Chapter[] = [
+  demoChapter,
+  acidsBasesSaltsChapter,
+  physicalChemicalChangesChapter,
+  parallelIntersectingLinesChapter,
+];
 
 export function getChapter(slug: string): Chapter | undefined {
   return chapters.find((c) => c.slug === slug);
