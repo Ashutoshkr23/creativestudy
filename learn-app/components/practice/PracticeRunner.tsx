@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import type { PracticeQuestion } from "@/lib/question-bank";
 import { useFeedbackSounds } from "@/components/player/useBeep";
+import { QuestionFigure } from "./QuestionFigure";
 
 // Standalone MCQ runner for the Practice Arena (not tied to ChapterPlayer).
 // Score + in-run streak, instant feedback, no timers. Each answer is saved via
@@ -144,6 +145,8 @@ export function PracticeRunner({
       </div>
 
       <h2 className="mb-5 whitespace-pre-line font-head text-lg sm:text-xl">{question.prompt}</h2>
+
+      {question.figure && <QuestionFigure figure={question.figure} />}
 
       <div className="flex w-full flex-col gap-2.5">
         {displayOptions.map((option) => {

@@ -1,4 +1,4 @@
-import type { Chapter, QuestionOption } from "@/content/types";
+import type { Chapter, FigureSpec, QuestionOption } from "@/content/types";
 import { getChapter, listChapters } from "@/content";
 
 // Every chapter's objective-question pool for the Practice Arena: the authored
@@ -13,6 +13,7 @@ export type PracticeQuestion = {
   options: QuestionOption[];
   correct: string; // option id
   explain?: string;
+  figure?: FigureSpec;
 };
 
 // Same seeded PRNG approach as MatchScene — deterministic everywhere.
@@ -48,6 +49,18 @@ export function getQuestionBank(chapterSlug: string): PracticeQuestion[] {
   const chapter = getChapter(chapterSlug);
   if (!chapter) return [];
   const bank: PracticeQuestion[] = [];
+
+  for (const q of chapter.exercises ?? []) {
+    bank.push({
+      questionId: q.questionId,
+      chapterSlug,
+      prompt: q.prompt,
+      options: q.options,
+      correct: q.correct,
+      explain: q.explain,
+      figure: q.figure,
+    });
+  }
 
   for (const scene of chapter.scenes) {
     switch (scene.type) {
