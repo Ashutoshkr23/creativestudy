@@ -3,9 +3,15 @@ import { demoChapter } from "./chapters/demo";
 import { acidsBasesSaltsChapter } from "./chapters/acids-bases-salts";
 import { physicalChemicalChangesChapter } from "./chapters/physical-chemical-changes";
 import { parallelIntersectingLinesChapter } from "./chapters/parallel-intersecting-lines";
+import { nutritionInPlantsChapter } from "./chapters/nutrition-in-plants";
+import { nutritionInAnimalsChapter } from "./chapters/nutrition-in-animals";
+import { temperatureAndHeatChapter } from "./chapters/temperature-and-heat";
 
 const chapters: Chapter[] = [
   demoChapter,
+  nutritionInPlantsChapter,
+  nutritionInAnimalsChapter,
+  temperatureAndHeatChapter,
   acidsBasesSaltsChapter,
   physicalChemicalChangesChapter,
   parallelIntersectingLinesChapter,

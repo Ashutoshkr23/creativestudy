@@ -15,6 +15,7 @@ import { AnglePartners } from "./AnglePartners";
 import { ScissorsSim } from "./ScissorsSim";
 import { LetterHunt } from "./LetterHunt";
 import { ParallelTester } from "./ParallelTester";
+import { TempConverter } from "./TempConverter";
 
 // Registry of bespoke interactive scenes. Content modules reference these by
 // name as { type: "custom", component: "<name>" }.
@@ -35,4 +36,5 @@ export const customComponents: Record<string, ComponentType<Record<string, unkno
   "scissors-sim": ScissorsSim,
   "letter-hunt": LetterHunt,
   "parallel-tester": ParallelTester,
+  "temp-converter": TempConverter,
 };
