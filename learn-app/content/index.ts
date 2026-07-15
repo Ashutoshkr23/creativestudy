@@ -6,6 +6,7 @@ import { parallelIntersectingLinesChapter } from "./chapters/parallel-intersecti
 import { nutritionInPlantsChapter } from "./chapters/nutrition-in-plants";
 import { nutritionInAnimalsChapter } from "./chapters/nutrition-in-animals";
 import { temperatureAndHeatChapter } from "./chapters/temperature-and-heat";
+import { stateGovernmentChapter } from "./chapters/state-government";
 
 const chapters: Chapter[] = [
   demoChapter,
@@ -15,6 +16,7 @@ const chapters: Chapter[] = [
   acidsBasesSaltsChapter,
   physicalChemicalChangesChapter,
   parallelIntersectingLinesChapter,
+  stateGovernmentChapter,
 ];
 
 export function getChapter(slug: string): Chapter | undefined {

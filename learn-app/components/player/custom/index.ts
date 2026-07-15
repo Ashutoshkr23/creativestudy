@@ -16,6 +16,7 @@ import { ScissorsSim } from "./ScissorsSim";
 import { LetterHunt } from "./LetterHunt";
 import { ParallelTester } from "./ParallelTester";
 import { TempConverter } from "./TempConverter";
+import { BillToAct } from "./BillToAct";
 
 // Registry of bespoke interactive scenes. Content modules reference these by
 // name as { type: "custom", component: "<name>" }.
@@ -37,4 +38,5 @@ export const customComponents: Record<string, ComponentType<Record<string, unkno
   "letter-hunt": LetterHunt,
   "parallel-tester": ParallelTester,
   "temp-converter": TempConverter,
+  "bill-to-act": BillToAct,
 };
