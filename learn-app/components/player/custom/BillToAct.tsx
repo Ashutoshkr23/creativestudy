@@ -61,8 +61,11 @@ const STEPS: Step[] = [
   },
 ];
 
-export function BillToAct() {
+export function BillToAct(props: Record<string, unknown> = {}) {
   const { next } = usePlayer();
+  // Inside the Statehouse hub, onComplete marks the room cleared instead of
+  // advancing the whole chapter.
+  const finish = (props.onComplete as (() => void) | undefined) ?? next;
   const sounds = useFeedbackSounds();
   const [stepIdx, setStepIdx] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
@@ -110,7 +113,7 @@ export function BillToAct() {
             the Legislative Assembly.
           </p>
           <div className="text-center">
-            <button onClick={next} className="rounded-btn px-6 py-3 font-head font-semibold text-white" style={{ background: "var(--accent)" }}>
+            <button onClick={finish} className="rounded-btn px-6 py-3 font-head font-semibold text-white" style={{ background: "var(--accent)" }}>
               Continue ↓
             </button>
           </div>

@@ -33,6 +33,13 @@ export function ChapterPlayer({ chapter }: { chapter: Chapter }) {
   const next = useCallback(() => go(indexRef.current + 1), [go]);
   const prev = useCallback(() => go(indexRef.current - 1), [go]);
 
+  // A fullscreen custom scene owns its own navigation — the player must not
+  // advance scenes on swipe/wheel/arrow while it is active.
+  const isNavLocked = (i: number) => {
+    const s = chapter.scenes[i];
+    return s?.type === "custom" && Boolean(s.fullscreen);
+  };
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       // Don't hijack arrows from sliders, dropdowns and text fields inside scenes.
@@ -40,6 +47,7 @@ export function ChapterPlayer({ chapter }: { chapter: Chapter }) {
       if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement) {
         return;
       }
+      if (isNavLocked(indexRef.current)) return;
       if (e.key === "ArrowDown" || e.key === "PageDown") {
         e.preventDefault();
         next();
@@ -56,6 +64,7 @@ export function ChapterPlayer({ chapter }: { chapter: Chapter }) {
   // If the current scene's content is taller than the screen, let it scroll
   // internally first; only flip scenes when it is at an edge.
   const onWheel = (e: React.WheelEvent) => {
+    if (isNavLocked(indexRef.current)) return;
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     const scene = (e.target as HTMLElement).closest("[data-scene]");
     if (scene && scene.scrollHeight > scene.clientHeight + 1) {
@@ -76,6 +85,7 @@ export function ChapterPlayer({ chapter }: { chapter: Chapter }) {
     touchStartY.current = e.touches[0].clientY;
   };
   const onTouchEnd = (e: React.TouchEvent) => {
+    if (isNavLocked(indexRef.current)) return;
     if (touchStartY.current === null) return;
     const dy = touchStartY.current - e.changedTouches[0].clientY;
     if (Math.abs(dy) > 50) {

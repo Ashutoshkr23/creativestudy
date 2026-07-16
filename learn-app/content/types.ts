@@ -74,6 +74,11 @@ export type CustomScene = {
   id: string;
   component: string; // key in components/player/custom registry
   props?: Record<string, unknown>;
+  /** When true, the player disables swipe/wheel/arrow scene navigation while
+   * this scene is active — for immersive components that manage their own
+   * internal navigation (e.g. the Statehouse hub). The component advances the
+   * chapter by calling usePlayer().next() when done. */
+  fullscreen?: boolean;
 };
 
 export type Scene =

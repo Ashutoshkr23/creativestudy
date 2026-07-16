@@ -17,6 +17,8 @@ import { LetterHunt } from "./LetterHunt";
 import { ParallelTester } from "./ParallelTester";
 import { TempConverter } from "./TempConverter";
 import { BillToAct } from "./BillToAct";
+import { MajorityMaker } from "./MajorityMaker";
+import { Statehouse } from "./Statehouse";
 
 // Registry of bespoke interactive scenes. Content modules reference these by
 // name as { type: "custom", component: "<name>" }.
@@ -39,4 +41,6 @@ export const customComponents: Record<string, ComponentType<Record<string, unkno
   "parallel-tester": ParallelTester,
   "temp-converter": TempConverter,
   "bill-to-act": BillToAct,
+  "majority-maker": MajorityMaker,
+  "statehouse": Statehouse,
 };
