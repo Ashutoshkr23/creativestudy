@@ -1,4 +1,4 @@
-import type { Chapter, FigureSpec, QuestionOption } from "@/content/types";
+import type { Chapter, FigureSpec, QuestionOption, QuestionType } from "@/content/types";
 import { getChapter, listChapters } from "@/content";
 
 // Every chapter's objective-question pool for the Practice Arena: the authored
@@ -10,8 +10,10 @@ export type PracticeQuestion = {
   questionId: string;
   chapterSlug: string;
   prompt: string;
-  options: QuestionOption[];
-  correct: string; // option id
+  qtype: QuestionType;
+  options: QuestionOption[]; // empty for fill-blank
+  correct: string; // option id — "" for fill-blank
+  answers?: string[]; // accepted typed answers for fill-blank
   explain?: string;
   figure?: FigureSpec;
 };
@@ -55,8 +57,10 @@ export function getQuestionBank(chapterSlug: string): PracticeQuestion[] {
       questionId: q.questionId,
       chapterSlug,
       prompt: q.prompt,
-      options: q.options,
-      correct: q.correct,
+      qtype: q.qtype ?? "mcq",
+      options: q.options ?? [],
+      correct: q.correct ?? "",
+      answers: q.answers,
       explain: q.explain,
       figure: q.figure,
     });
@@ -69,6 +73,7 @@ export function getQuestionBank(chapterSlug: string): PracticeQuestion[] {
           questionId: scene.questionId,
           chapterSlug,
           prompt: scene.prompt,
+          qtype: "mcq",
           options: scene.options,
           correct: scene.correct,
           explain: scene.explain,
@@ -80,6 +85,7 @@ export function getQuestionBank(chapterSlug: string): PracticeQuestion[] {
             questionId: q.questionId,
             chapterSlug,
             prompt: q.prompt,
+            qtype: "mcq",
             options: q.options,
             correct: q.correct,
             explain: q.explain,
@@ -95,6 +101,7 @@ export function getQuestionBank(chapterSlug: string): PracticeQuestion[] {
             questionId: id,
             chapterSlug,
             prompt: `"${pair.left}" goes with…`,
+            qtype: "mcq",
             options,
             correct,
           });
@@ -108,6 +115,7 @@ export function getQuestionBank(chapterSlug: string): PracticeQuestion[] {
             questionId: id,
             chapterSlug,
             prompt: `"${item.label}" belongs to which group?`,
+            qtype: "mcq",
             options,
             correct: options[item.bucket].id,
           });
@@ -122,6 +130,7 @@ export function getQuestionBank(chapterSlug: string): PracticeQuestion[] {
             questionId: id,
             chapterSlug,
             prompt: `What does "${w.word}" mean?`,
+            qtype: "mcq",
             options,
             correct,
           });
@@ -130,6 +139,13 @@ export function getQuestionBank(chapterSlug: string): PracticeQuestion[] {
     }
   }
   return bank;
+}
+
+/** Per-type question counts for a chapter, for the Practice Arena filters. */
+export function getBankTypeCounts(chapterSlug: string): Record<QuestionType, number> {
+  const counts: Record<QuestionType, number> = { mcq: 0, "true-false": 0, "fill-blank": 0 };
+  for (const q of getQuestionBank(chapterSlug)) counts[q.qtype] += 1;
+  return counts;
 }
 
 export function getBankSizes(): { slug: string; size: number }[] {

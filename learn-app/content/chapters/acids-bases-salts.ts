@@ -475,4 +475,75 @@ export const acidsBasesSaltsChapter: Chapter = {
       body: "You identified mystery liquids with indicators, explored the pH scale, neutralised an acid with your own hands, rescued four people with chemistry, named salts like a factory, and cracked the three-bottle case. Every liquid on that tray now has a label — mission complete!",
     },
   ],
+  exercises: [
+    // ——— True / False ———
+    {
+      questionId: "abs-tf-1",
+      prompt: "True or False: Acids turn blue litmus paper red.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "a",
+    },
+    {
+      questionId: "abs-tf-2",
+      prompt: "True or False: Bases are sour in taste.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "b",
+      explain: "Bases are bitter and feel soapy; acids are the sour ones.",
+    },
+    {
+      questionId: "abs-tf-3",
+      prompt: "True or False: Phenolphthalein turns pink in an acidic solution.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "b",
+      explain: "Phenolphthalein is colourless in acid and turns pink in a base.",
+    },
+    {
+      questionId: "abs-tf-4",
+      prompt: "True or False: An acid and a base react together to form a salt and water.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "a",
+    },
+    {
+      questionId: "abs-tf-5",
+      prompt: "True or False: Common salt is sodium chloride.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "a",
+    },
+    // ——— Fill in the blanks ———
+    {
+      questionId: "abs-fb-1",
+      prompt: "Acids turn blue litmus paper ______.",
+      qtype: "fill-blank",
+      answers: ["red"],
+    },
+    {
+      questionId: "abs-fb-2",
+      prompt: "A base that dissolves in water is called an ______.",
+      qtype: "fill-blank",
+      answers: ["alkali"],
+    },
+    {
+      questionId: "abs-fb-3",
+      prompt: "The reaction between an acid and a base is called ______.",
+      qtype: "fill-blank",
+      answers: ["neutralisation", "neutralization"],
+    },
+    {
+      questionId: "abs-fb-4",
+      prompt: "The chemical name of common salt is sodium ______.",
+      qtype: "fill-blank",
+      answers: ["chloride"],
+    },
+    {
+      questionId: "abs-fb-5",
+      prompt: "A mixture of indicators that shows a different colour for each pH value is called a ______ indicator.",
+      qtype: "fill-blank",
+      answers: ["universal"],
+    },
+  ],
 };

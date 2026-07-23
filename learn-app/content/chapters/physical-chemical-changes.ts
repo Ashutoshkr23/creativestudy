@@ -374,4 +374,69 @@ export const physicalChemicalChangesChapter: Chapter = {
       body: "You pressed the universe's UNDO button, drove water through all three states, spotted the signs of chemical change, proved what rust needs and how to stop it, saved a bicycle and a tiffin box, and grew pure crystals. Physical or chemical — no change can fool you now!",
     },
   ],
+  exercises: [
+    // ——— True / False ———
+    {
+      questionId: "pcc-tf-1",
+      prompt: "True or False: Rusting of iron is a physical change.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "b",
+      explain: "Rusting forms a new substance (iron oxide), so it's a chemical change.",
+    },
+    {
+      questionId: "pcc-tf-2",
+      prompt: "True or False: Burning of a candle is a chemical change.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "a",
+    },
+    {
+      questionId: "pcc-tf-3",
+      prompt: "True or False: Melting of ice is a reversible change.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "a",
+    },
+    {
+      questionId: "pcc-tf-4",
+      prompt: "True or False: A chemical change can usually be reversed easily.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "b",
+      explain: "Chemical changes are usually permanent — you can't un-burn paper.",
+    },
+    {
+      questionId: "pcc-tf-5",
+      prompt: "True or False: Crystallisation is a physical change.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "a",
+    },
+    // ——— Fill in the blanks ———
+    {
+      questionId: "pcc-fb-1",
+      prompt: "The formation of rust needs oxygen and ______.",
+      qtype: "fill-blank",
+      answers: ["water"],
+    },
+    {
+      questionId: "pcc-fb-2",
+      prompt: "Impure copper sulphate can be purified by the process of ______.",
+      qtype: "fill-blank",
+      answers: ["crystallisation", "crystallization"],
+    },
+    {
+      questionId: "pcc-fb-3",
+      prompt: "Coating iron with a layer of zinc to prevent rusting is called ______.",
+      qtype: "fill-blank",
+      answers: ["galvanisation", "galvanization"],
+    },
+    {
+      questionId: "pcc-fb-4",
+      prompt: "Melting of wax is a ______ change.",
+      qtype: "fill-blank",
+      answers: ["physical"],
+    },
+  ],
 };

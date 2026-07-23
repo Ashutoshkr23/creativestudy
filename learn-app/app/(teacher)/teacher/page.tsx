@@ -13,19 +13,17 @@ export default async function TeacherDashboard({
 }) {
   const { chapter: chapterParam } = await searchParams;
   const chapters = listChapters();
-  const chapter = getChapter(chapterParam ?? "") ?? chapters[0];
   const dbReady = isDbConfigured();
-  const { rows, mostMissed } = dbReady
-    ? await getChapterDashboard(chapter.slug)
-    : { rows: [], mostMissed: [] };
 
   // Most-improved: single positive callout (self-comparison, never a leaderboard).
   let improvedName: string | null = null;
   let improvedStats: { pct: number; delta: number } | null = null;
   if (dbReady) {
     const since = new Date(Date.now() - 15 * 86_400_000).toISOString();
-    const winner = mostImproved(await getRecentAttemptsAllStudents(since), todayString());
+    const attempts = await getRecentAttemptsAllStudents(since);
+    const winner = mostImproved(attempts, todayString());
     if (winner) {
+      const { rows } = await getChapterDashboard(chapters[0].slug);
       const student = rows.find((r) => r.student.id === winner.student_id)?.student;
       if (student) {
         improvedName = student.display_name;
@@ -34,38 +32,111 @@ export default async function TeacherDashboard({
     }
   }
 
+  const selectedChapter = chapterParam ? getChapter(chapterParam) : undefined;
+
+  // ————————————————————— SUBJECT-GROUPED CHAPTER LIST (landing) —————————————————————
+  if (!selectedChapter) {
+    // Group by subject; keep the demo chapter last.
+    const bySubject = new Map<string, typeof chapters>();
+    for (const c of chapters) {
+      const key = c.subject === "Demo" ? "Tutorial" : c.subject;
+      if (!bySubject.has(key)) bySubject.set(key, []);
+      bySubject.get(key)!.push(c);
+    }
+    const subjects = [...bySubject.keys()].sort((a, b) =>
+      a === "Tutorial" ? 1 : b === "Tutorial" ? -1 : a.localeCompare(b)
+    );
+
+    return (
+      <main>
+        {improvedName && improvedStats && (
+          <p className="mb-6 rounded-card border border-teal/40 bg-teal/10 px-4 py-3 text-sm text-teal">
+            🌟 Most improved this week: <b>{improvedName}</b>
+            {` — ${improvedStats.pct}% correct, up ${improvedStats.delta} points on last week.`}
+          </p>
+        )}
+
+        <h2 className="mb-1 font-head text-lg">Your chapters</h2>
+        <p className="mb-6 text-sm text-ink-secondary">
+          Pick a chapter to see who&apos;s practised it and the questions your class misses most.
+        </p>
+
+        {!dbReady && (
+          <div className="mb-6 rounded-card border border-amber/30 bg-amber/10 p-5 text-sm text-ink-secondary">
+            ⚠️ The database is not set up yet. Follow the Supabase steps in{" "}
+            <code className="text-ink">learn-app/README.md</code> and fill in{" "}
+            <code className="text-ink">.env.local</code> to start seeing student progress.
+          </div>
+        )}
+
+        <div className="flex flex-col gap-6">
+          {subjects.map((subject) => (
+            <section key={subject}>
+              <h3 className="mb-2 text-xs font-semibold uppercase tracking-widest text-ink-secondary">
+                {subject}
+              </h3>
+              <div className="flex flex-col gap-2.5">
+                {bySubject.get(subject)!.map((c) => (
+                  <div
+                    key={c.slug}
+                    className="flex items-center gap-3 rounded-card border border-line bg-surface p-4"
+                  >
+                    <Link href={`/teacher?chapter=${c.slug}`} className="flex min-w-0 flex-1 items-center gap-3">
+                      <span className="text-2xl">{c.emoji}</span>
+                      <div className="min-w-0">
+                        <div className="font-head font-semibold">{c.title}</div>
+                        <div className="truncate text-xs text-ink-secondary">{c.description}</div>
+                      </div>
+                    </Link>
+                    <Link
+                      href={`/app/chapter/${c.slug}`}
+                      target="_blank"
+                      className="shrink-0 rounded-btn border border-line bg-surface-2 px-3 py-1.5 text-xs text-ink-secondary transition-colors hover:border-line-strong hover:text-ink"
+                    >
+                      ▶ Teach
+                    </Link>
+                    <Link
+                      href={`/teacher?chapter=${c.slug}`}
+                      className="shrink-0 text-ink-muted"
+                      aria-label={`Open ${c.title} stats`}
+                    >
+                      →
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </main>
+    );
+  }
+
+  // ————————————————————— PER-CHAPTER STATS (drill-in) —————————————————————
+  const { rows, mostMissed } = dbReady
+    ? await getChapterDashboard(selectedChapter.slug)
+    : { rows: [], mostMissed: [] };
+
   return (
     <main>
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        <h2 className="mr-2 font-head text-lg">Chapter:</h2>
-        {chapters.map((c) => (
-          <Link
-            key={c.slug}
-            href={`/teacher?chapter=${c.slug}`}
-            className={`rounded-full border px-4 py-1.5 text-sm transition-colors ${
-              c.slug === chapter.slug
-                ? "border-primary bg-primary/15 text-ink"
-                : "border-line bg-surface text-ink-secondary hover:border-line-strong"
-            }`}
-          >
-            {c.emoji} {c.title}
-          </Link>
-        ))}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
         <Link
-          href={`/app/chapter/${chapter.slug}`}
+          href="/teacher"
+          className="rounded-btn border border-line bg-surface px-3.5 py-1.5 text-sm text-ink-secondary transition-colors hover:border-line-strong hover:text-ink"
+        >
+          ← All chapters
+        </Link>
+        <h2 className="font-head text-lg">
+          {selectedChapter.emoji} {selectedChapter.title}
+        </h2>
+        <Link
+          href={`/app/chapter/${selectedChapter.slug}`}
           target="_blank"
           className="ml-auto rounded-btn border border-line bg-surface px-4 py-1.5 text-sm text-ink-secondary transition-colors hover:border-line-strong hover:text-ink"
         >
           ▶ Teach this chapter
         </Link>
       </div>
-
-      {improvedName && improvedStats && (
-        <p className="mb-6 rounded-card border border-teal/40 bg-teal/10 px-4 py-3 text-sm text-teal">
-          🌟 Most improved this week: <b>{improvedName}</b>
-          {` — ${improvedStats.pct}% correct, up ${improvedStats.delta} points on last week.`}
-        </p>
-      )}
 
       {!dbReady ? (
         <div className="rounded-card border border-amber/30 bg-amber/10 p-6 text-sm text-ink-secondary">
@@ -144,7 +215,7 @@ export default async function TeacherDashboard({
                   >
                     <span className="font-head text-lg font-bold text-coral">#{i + 1}</span>
                     <span className="min-w-0 flex-1">
-                      {getQuestionLabel(chapter.slug, q.question_id)}
+                      {getQuestionLabel(selectedChapter.slug, q.question_id)}
                     </span>
                     <span className="shrink-0 text-xs text-ink-secondary">
                       {q.wrong_count} wrong / {q.total_count} tries

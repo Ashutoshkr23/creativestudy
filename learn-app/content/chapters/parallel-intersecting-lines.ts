@@ -637,5 +637,61 @@ export const parallelIntersectingLinesChapter: Chapter = {
       correct: "a",
       explain: "Angles round a point add to 360°: q = 360° − 270° − 42° = 48°.",
     },
+    // ——— True / False ———
+    {
+      questionId: "pil-tf-1",
+      prompt: "True or False: Vertically opposite angles are always equal.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "a",
+    },
+    {
+      questionId: "pil-tf-2",
+      prompt: "True or False: The sum of the angles on a straight line is 360°.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "b",
+      explain: "Angles on a straight line add up to 180°. A full turn round a point is 360°.",
+    },
+    {
+      questionId: "pil-tf-3",
+      prompt: "True or False: Two lines in a plane that never meet are called parallel lines.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "a",
+    },
+    {
+      questionId: "pil-tf-4",
+      prompt: "True or False: Co-interior angles between parallel lines are equal.",
+      qtype: "true-false",
+      options: [{ id: "a", label: "True" }, { id: "b", label: "False" }],
+      correct: "b",
+      explain: "Co-interior (C) angles are supplementary — they add up to 180°, not equal.",
+    },
+    // ——— Fill in the blanks ———
+    {
+      questionId: "pil-fb-1",
+      prompt: "Two angles whose sum is 90° are called ______ angles.",
+      qtype: "fill-blank",
+      answers: ["complementary"],
+    },
+    {
+      questionId: "pil-fb-2",
+      prompt: "Two angles whose sum is 180° are called ______ angles.",
+      qtype: "fill-blank",
+      answers: ["supplementary"],
+    },
+    {
+      questionId: "pil-fb-3",
+      prompt: "The sum of all the angles around a point is ______ degrees.",
+      qtype: "fill-blank",
+      answers: ["360", "360°"],
+    },
+    {
+      questionId: "pil-fb-4",
+      prompt: "The complement of a 60° angle is ______ degrees.",
+      qtype: "fill-blank",
+      answers: ["30", "30°"],
+    },
   ],
 };

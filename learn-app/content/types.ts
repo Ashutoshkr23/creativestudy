@@ -102,11 +102,19 @@ export type FigureSpec =
   | { kind: "transversal"; labels: Partial<Record<"1" | "2" | "3" | "4" | "5" | "6" | "7" | "8", string>>; parallel?: boolean };
 
 /** A tracked exercise question — part of the chapter's practice bank, not a scene. */
+/** A question's answer format, used to let students practise by type. */
+export type QuestionType = "mcq" | "true-false" | "fill-blank";
+
 export type ExerciseQuestion = {
   questionId: string; // stable id — never reuse for a different question
   prompt: string;
-  options: QuestionOption[];
-  correct: string;
+  /** Answer format. Defaults to "mcq" when omitted. */
+  qtype?: QuestionType;
+  /** Required for "mcq" and "true-false" (use [True, False] options for T/F). */
+  options?: QuestionOption[];
+  correct?: string; // option id — required for mcq / true-false
+  /** Required for "fill-blank": accepted typed answers (matched case-insensitively). */
+  answers?: string[];
   explain?: string;
   figure?: FigureSpec;
 };
